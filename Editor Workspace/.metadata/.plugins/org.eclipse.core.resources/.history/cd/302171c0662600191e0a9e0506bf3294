@@ -1,0 +1,71 @@
+package br.com.lunacore.lunalire.components;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.XmlReader.Element;
+import com.kotcrab.vis.ui.widget.VisTable;
+
+import br.com.lunacore.lunalire.LireComponent;
+import br.com.lunacore.lunalire.LireObject;
+
+public class CameraComponent extends LireComponent{
+
+	OrthographicCamera camera;
+	
+	public void read(Element comp, FileHandle relativePath) {
+		camera = new OrthographicCamera();
+		
+		Element viewport = comp.getChildByName("viewport");
+		
+		camera.setToOrtho(false,
+				viewport.getFloat("width") * parent.getTransform().getScale().x,
+				viewport.getFloat("height") * parent.getTransform().getScale().y);
+		camera.position.set(
+				parent.getTransform().getPosition().x,
+				parent.getTransform().getPosition().y,
+				0
+				);
+		camera.zoom = viewport.getFloat("zoom");
+		
+		if(parent.getScene() != null) {
+			parent.getScene().setCamera(camera);
+		}
+	}
+	
+	public void create() {
+		
+	}
+	
+	public void draw(Batch sb, float parentAlpha) {
+		
+	}
+
+	public void update(float delta) {
+		
+	}
+
+	public void dispose() {
+		
+	}
+
+	public boolean validate(LireObject obj) {
+		return false;
+	}
+
+	public void act(float delta) {
+		
+	}
+
+	
+
+	public VisTable getUITable(DragAndDrop dragndrop) {
+		return new VisTable();
+	}
+
+	public Element getXmlElement(Element root) {
+		return null;
+	}
+
+}

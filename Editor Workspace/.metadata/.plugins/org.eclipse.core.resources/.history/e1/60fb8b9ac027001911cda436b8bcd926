@@ -1,0 +1,10 @@
+<object name="Sprite" z="0">
+	<transform>
+		<position x="0.0" y="0.0"/>
+		<rotation value="0.0"/>
+		<scale x="1.0" y="1.0"/>
+	</transform>
+	<component class="br.com.lunacore.lunalire.components.SpriteComponent">
+		<sprite loc="sidney.png" flipX="false" flipY="false"/>
+	</component>
+</object>

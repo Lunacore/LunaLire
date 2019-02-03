@@ -1,0 +1,17 @@
+package br.com.lunacore.helper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+public class MultiInputStreamReader extends InputStream{
+
+	public MultiInputStreamReader() {
+		super();
+	}
+	
+	public int read() throws IOException {
+		return 0;
+	}
+
+}

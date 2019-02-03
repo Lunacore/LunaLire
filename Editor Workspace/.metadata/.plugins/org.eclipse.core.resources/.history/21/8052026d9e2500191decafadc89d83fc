@@ -1,0 +1,46 @@
+package br.com.lunacore.custom;
+
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+import com.kotcrab.vis.ui.widget.VisDialog;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.VisTextField;
+
+import br.com.lunacore.custom.YesNoDialog.DialogListener;
+
+public class StringInputDialog extends VisDialog{
+
+	String textInput;
+	
+	public StringInputDialog(String title, String text, DialogListener listener) {
+		super(title);
+		
+		clear();
+		
+		VisLabel lbl = new VisLabel(text);
+		lbl.setAlignment(Align.center);
+		add(lbl).growX().align(Align.top).row();
+		
+		final VisTextField field = new VisTextField();
+		add(field).growX().align(Align.center).row();
+		
+		VisTextButton okButton = new VisTextButton("Ok");
+		
+		okButton.addListener(new ClickListener() {
+			public void clicked(InputEvent event, float x, float y) {
+				textInput = field.getText();
+				close();
+			}
+		});
+		
+	}
+	
+	public void getText() {
+		
+	}
+	
+	
+
+}

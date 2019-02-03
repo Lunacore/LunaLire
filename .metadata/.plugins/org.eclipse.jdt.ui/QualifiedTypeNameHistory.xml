@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="br.com.lunacore.math.Transform"/>
+<fullyQualifiedTypeName name="br.com.lunacore.tiled.MyBox2DMapObjectParser.Listener.Adapter"/>
+<fullyQualifiedTypeName name="br.com.lunacore.entities.ObjectInfo"/>
+<fullyQualifiedTypeName name="br.com.lunacore.states.State"/>
+<fullyQualifiedTypeName name="javax.swing.plaf.multi.MultiInternalFrameUI"/>
+<fullyQualifiedTypeName name="java.io.InputStream"/>
+<fullyQualifiedTypeName name="br.com.lunacore.helper.MultiInputStreamReader"/>
+<fullyQualifiedTypeName name="java.io.InputStreamReader"/>
+<fullyQualifiedTypeName name="java.io.BufferedReader"/>
+</qualifiedTypeNameHistroy>

@@ -1,0 +1,34 @@
+package br.com.lunacore.lunalire;
+
+import java.util.HashMap;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+public class LunaLireStarter {
+
+	//Puxar todos os arquivos da pasta SRC e tacar pra carregar no AssetManager
+	
+	static SpriteBatch batch;
+	static LireStateManager stateManager;
+	static boolean drawFPS = false;
+	AssetManager assetManager;
+		
+	public static void init() {
+		batch = new SpriteBatch();
+		stateManager = new LireStateManager();
+		//Carrega as cenas a partir do arquivo .ll
+
+	}
+	
+	public static void render() {
+		stateManager.render(batch);
+		stateManager.update(Gdx.graphics.getDeltaTime());
+	}
+	
+	public static void dispose() {
+		stateManager.dispose();
+	}
+	
+}

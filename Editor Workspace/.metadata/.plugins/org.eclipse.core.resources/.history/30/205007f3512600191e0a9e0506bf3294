@@ -1,0 +1,32 @@
+package br.com.lunacore.ui;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import com.kotcrab.vis.ui.widget.VisTable;
+
+public class ConsoleWindow extends VisTable{
+	
+	
+	
+	public ConsoleWindow(final InputStream stream) {
+		super();
+		
+		
+		
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					InputStreamReader isr = new InputStreamReader(stream);
+					BufferedReader br = new BufferedReader(isr);
+	
+					String line = null;
+					while ( (line = br.readLine()) != null)
+					     System.out.println(line);
+				}
+			}
+		}).start();
+	}
+
+}

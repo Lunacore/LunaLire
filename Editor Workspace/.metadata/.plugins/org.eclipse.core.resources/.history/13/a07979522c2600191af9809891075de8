@@ -1,0 +1,36 @@
+package br.com.lunacore.custom;
+
+import java.io.IOException;
+import java.io.Writer;
+
+import com.badlogic.gdx.utils.XmlReader.Element;
+import com.badlogic.gdx.utils.XmlWriter;
+
+public class CustomXmlWriter extends XmlWriter{
+
+	public CustomXmlWriter(Writer writer) {
+		super(writer);
+	}
+	
+	public void setRoot(Element root) throws IOException {
+		
+		element(root.getName());
+		
+		if(root.getAttributes() != null) {
+			for(String s : root.getAttributes().keys()) {
+				attribute(s, root.getAttribute(s));
+			}
+		}
+		
+		for(int i = 0; i < root.getChildCount(); i ++) {
+			Element child = root.getChild(i);
+			setRoot(child);
+		}
+		
+		if(root.getText() != null)
+		text(root.getText());
+		
+		pop();
+	}
+
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete 8 elements from project &apos;default-game-desktop&apos;&#x0D;&#x0A;- Original project: &apos;default-game-desktop&apos;&#x0D;&#x0A;- Original elements:&#x0D;&#x0A;     gifexport&#x0D;&#x0A;     shaders&#x0D;&#x0A;     spriter&#x0D;&#x0A;     tiled&#x0D;&#x0A;     Allan-Bold.ttf&#x0D;&#x0A;     badlogic.jpg&#x0D;&#x0A;     slimes.png&#x0D;&#x0A;     sparkle.png" description="Delete elements" element1="assets/spriter" element2="assets/shaders" element3="assets/gifexport" element4="assets/slimes.png" element5="assets/sparkle.png" element6="assets/badlogic.jpg" element7="assets/tiled" element8="assets/Allan-Bold.ttf" elements="0" flags="589830" id="org.eclipse.jdt.ui.delete" resources="8" stamp="1548959891969" subPackages="false" version="1.0"/>
+</session>

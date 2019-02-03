@@ -1,0 +1,20 @@
+package br.com.lunacore;
+
+import com.badlogic.gdx.ApplicationAdapter;
+import br.com.lunacore.states.StateOne;
+
+public class MyGdxGame extends ApplicationAdapter {
+	public void create () {
+		AwesomeLibGDX.init();
+		AwesomeLibGDX.addState(new StateOne());
+		AwesomeLibGDX.create();
+	}
+
+	public void render () {
+		AwesomeLibGDX.render();
+	}
+	
+	public void dispose () {
+		AwesomeLibGDX.dispose();
+	}
+}

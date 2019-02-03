@@ -1,0 +1,284 @@
+package br.com.lunacore.lunalire;
+
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.XmlReader.Element;
+
+import br.com.lunacore.math.Transform;
+
+public class LireObject extends Actor{
+	
+	protected Transform transform;
+	private ArrayList<LireComponent> components;
+	private LireObject parent;
+	protected ArrayList<LireObject> children;
+	private Transform finalTransform;
+	protected LireScene scene;
+	int zorder;
+		
+	//Esses dois são mais usados pelo editor
+	//já q no editor eu n preciso criar uma INSTANCIA da classe
+	//mas eu preciso saber qual classe q é de qqr forma (e os parametros)
+	private Class childClass;
+	private HashMap<String, String> childParams;
+	
+	public LireObject(Element root, FileHandle assetsFolder, LireScene scene) {
+		this.scene = scene;
+		childParams = new HashMap<String, String>();
+		finalTransform = new Transform(Vector2.Zero.cpy());
+		transform = new Transform(Vector2.Zero.cpy());
+		components = new ArrayList<LireComponent>();
+		children = new ArrayList<LireObject>();
+		
+		if(root != null) {
+			try {
+				readXml(root, assetsFolder);
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void setParam(String key, String value) {
+		if(childParams == null) {
+			childParams = new HashMap<String, String>();
+		}
+		childParams.put(key, value);
+	}
+	
+	public String getParam(String key) {
+		if(childParams == null) {
+			return null;
+		}
+		else {
+			return childParams.get(key);
+		}
+	}
+	
+	private void readXml(Element root, FileHandle relativePath) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		Element tr = root.getChildByName("transform");
+		if(tr == null) {
+			System.err.println("No transform found on object " + root.getAttribute("name"));
+		}
+		else {
+			float x = Float.parseFloat(tr.getChildByName("position").getAttribute("x"));
+			float y = Float.parseFloat(tr.getChildByName("position").getAttribute("y"));
+			transform.getPosition().set(x, y);
+			
+			float rotation = Float.parseFloat(tr.getChildByName("rotation").getAttribute("value"));
+			transform.setAngle(rotation);
+			
+			float sx = Float.parseFloat(tr.getChildByName("scale").getAttribute("x"));
+			float sy = Float.parseFloat(tr.getChildByName("scale").getAttribute("y"));
+			transform.getScale().set(sx, sy);
+		}
+		
+		if(root.getAttribute("class", null) != null) {
+			//Preciso compilar
+			try {
+				childClass = LunaLireStarter.lireForName(root.getAttribute("class"));
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		setZOrder(Integer.parseInt(root.getAttribute("z", "0")));
+		setName(root.getAttribute("name"));
+
+		for(Element el : root.getChildrenByName("component")) {
+			Class lc = Class.forName(el.getAttribute("class"));
+			addComponent(lc);
+			getComponent(lc).read(el, relativePath);
+		}
+	}
+	
+	public void setZOrder(int zorder) {
+		this.zorder = zorder;
+		setZIndex(zorder);
+	}
+	
+	public int getZOrder() {
+		return zorder;
+	}
+	
+	public Transform getTransform() {
+		return transform;
+	}
+	
+	public <T extends LireComponent> T getComponent(Class class1){
+		for(LireComponent c : components) {
+			if(class1.equals(c.getClass())) {
+				return (T) c;
+			}
+		}
+		return null;
+	}
+	
+	public Rectangle getBounds() {
+		return new Rectangle(
+				getFinalTransform().getPosition().x,
+				getFinalTransform().getPosition().y,
+				50 * getFinalTransform().getScale().x,
+				50 * getFinalTransform().getScale().y);
+	}
+	
+	public void act(float delta) {
+		super.act(delta);
+		for(LireComponent lc : components) {
+			lc.act(delta);
+		}
+		
+		if(getComponents().size() == 0) {
+			Rectangle bounds = getBounds();
+			setBounds(bounds.x - bounds.width/2f, bounds.y - bounds.height/2f, bounds.width, bounds.height);
+			setOrigin(bounds.width/2f, bounds.height/2f);
+			setRotation(getFinalTransform().getAngle());
+		}
+	}
+	
+	public void draw(Batch batch, float parentAlpha) {
+		for(LireComponent lc : components) {
+			lc.draw(batch, parentAlpha);
+		}
+	}
+	
+	public Transform getFinalTransform() {
+		
+		if(getLireParent() != null) {
+			finalTransform.getPosition().set(
+					transform.getPosition().cpy().scl(getLireParent().getFinalTransform().getScale())
+					.add(getLireParent().getFinalTransform().getPosition())
+					);
+			
+			finalTransform.setAngle(transform.getAngle() + getLireParent().getTransform().getAngle());
+			
+			finalTransform.setScale(transform.getScale().cpy().scl(getLireParent().getTransform().getScale()));
+			return finalTransform;
+		}
+		
+		return transform;
+		
+	}
+	
+	
+	public void attachChildren(LireObject object) {
+		object.setParent(this);
+		children.add(object);
+	}
+	
+	public void removeChildren(LireObject object) {
+		object.parent = null;
+		children.remove(object);
+	}
+
+	public Object addComponent(Class clazz) {
+		try {
+			LireComponent component = (LireComponent) clazz.newInstance();
+			
+			if(component.validate(this)) {
+				component.setParent(this);
+				components.add(component);
+				return component;
+			}
+			else {
+				return component.getValidationCause();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void drawDebug(ShapeRenderer shapes) {
+	}
+	
+	public void debugDraw(ShapeRenderer shapes) {
+		super.drawDebug(shapes);
+	}
+	
+	public ArrayList<LireObject> getChildren() {
+		return children;
+	}
+
+	public LireObject getLireParent() {
+		return parent;
+	}
+
+	public void setParent(LireObject parent) {
+		this.parent = parent;
+	}
+
+	public ArrayList<LireComponent> getComponents() {
+		return components;
+	}
+
+	public Element toXmlElement(Element parent) {
+		Element root = new Element("object", parent);
+		root.setAttribute("name", getName());
+		root.setAttribute("z", getZOrder() + "");
+		
+		if(childClass != null) {
+			root.setAttribute("class", childClass.getCanonicalName());
+			
+			if(childParams != null) {
+				Element custom = new Element("custom", root);
+				root.addChild(custom);
+				for(String key : childParams.keySet()) {
+					custom.setAttribute(key, childParams.get(key));
+				}
+			}
+		}
+		
+		Element transform = new Element("transform", root);
+		root.addChild(transform);
+		
+		Element pos = new Element("position", transform);
+		transform.addChild(pos);
+		pos.setAttribute("x", getTransform().getPosition().x + "");
+		pos.setAttribute("y", getTransform().getPosition().y + "");
+		
+		Element rot = new Element("rotation", transform);
+		transform.addChild(rot);
+		rot.setAttribute("value", getTransform().getAngle() + "");
+		
+		Element scl = new Element("scale", transform);
+		transform.addChild(scl);
+		scl.setAttribute("x", getTransform().getScale().x + "");
+		scl.setAttribute("y", getTransform().getScale().y + "");
+		
+		for(LireComponent lc : getComponents()) {
+			Element component = lc.getXmlElement(root);
+			root.addChild(component);
+		}
+		
+		return root;
+	}
+
+
+	public LireScene getScene() {
+		return scene;
+	}
+
+
+	public Class getChildClass() {
+		return childClass;
+	}
+
+
+	public void setChildClass(Class childClass) {
+		this.childClass = childClass;
+	}
+
+	public HashMap<String ,String> getParams() {
+		return childParams;
+	}
+	
+}

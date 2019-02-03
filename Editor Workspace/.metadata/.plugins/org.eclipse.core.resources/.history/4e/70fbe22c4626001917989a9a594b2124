@@ -1,0 +1,13 @@
+package br.com.lunacore;
+
+import com.badlogic.gdx.files.FileHandle;
+
+import br.com.lunacore.lunalire.LireObject;
+
+public class SimpleObject extends LireObject{
+
+	public SimpleObject(FileHandle configuration) {
+		super(configuration);
+	}
+
+}

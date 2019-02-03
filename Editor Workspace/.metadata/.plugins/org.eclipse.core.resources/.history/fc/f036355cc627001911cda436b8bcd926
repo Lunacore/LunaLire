@@ -1,0 +1,15 @@
+package br.com.lunacore.custom;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.XmlReader.Element;
+
+import br.com.lunacore.lunalire.LireObject;
+import br.com.lunacore.lunalire.LireScene;
+
+public class EditorLireObject extends LireObject{
+
+	public EditorLireObject(Element root, FileHandle assetsFolder, LireScene scene) {
+		super(root, assetsFolder, scene);
+	}
+
+}

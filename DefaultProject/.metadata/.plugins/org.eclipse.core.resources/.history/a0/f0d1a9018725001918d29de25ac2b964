@@ -1,0 +1,13 @@
+package br.com.lunacore.lunalire;
+
+public class LunaLireStarter {
+
+	public void init() {
+		
+	}
+	
+	public void addState() {
+		
+	}
+	
+}

@@ -1,0 +1,13 @@
+package br.com.lunacore.helper;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+public class MultiInputStreamReader extends InputStreamReader{
+
+	public MultiInputStreamReader(InputStream in) {
+		super(in);
+		// TODO Auto-generated constructor stub
+	}
+
+}

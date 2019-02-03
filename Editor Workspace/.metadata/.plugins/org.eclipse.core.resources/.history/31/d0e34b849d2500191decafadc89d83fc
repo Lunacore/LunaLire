@@ -1,0 +1,9 @@
+package br.com.lunacore.custom;
+
+import com.kotcrab.vis.ui.widget.VisDialog;
+
+public class StringInputDialog extends VisDialog{
+	
+	
+
+}

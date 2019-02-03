@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object name="Object Test">
+    <transform>
+    	<position x="0.0" y="0.0"/>
+    	<rotation x= "0.0" y="0.0"/>
+    	<scale x="1.0" y="1.0"/>
+    </transform>
+    <component class="br.com.lunacore.lunalire.components.CameraComponent">
+        <viewport width="1920.0" height="1080.0" x="0.0" y="0.0"/>
+    </component>
+    <component class="br.com.lunacore.lunalire.components.SpriteComponent">
+        <sprite loc="badlogic.png"/>
+    </component>
+    <component class="br.com.lunacore.lunalire.components.TextComponent">
+        <font loc="font.fnt"/>
+        <text value="O monark é lindo não é?"/>
+    </component>
+</object>

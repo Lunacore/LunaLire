@@ -1,0 +1,14 @@
+project root
+	build.gradle -> default-game
+	.project -> DefaultProject
+	.metadata
+
+project core
+	.project -> default-game
+	br/com/lunacore/MyGdxGame.java -> DesktopLauncher
+
+project desktop
+	build.gradle -> com.mygdx.game.desktop.DesktopLauncher
+	.project -> default-game
+	src/com/mygdx/game/desktop/DesktopLauncher.java -> DesktopLauncher
+

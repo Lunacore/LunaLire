@@ -1,0 +1,30 @@
+package br.com.lunacore.custom;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+import com.kotcrab.vis.ui.widget.VisTextArea;
+
+public class ConsoleOutputStream extends OutputStream{
+
+	OutputStream sys;
+	VisTextArea area;
+	
+	public ConsoleOutputStream(OutputStream sys, VisTextArea area) {
+		this.sys = sys;
+		this.area = area;
+	}
+	
+	public void write(int b) throws IOException {
+		sys.write(b);
+		
+		
+		if((area.getText() + String.valueOf((char)b)).length() > area.getMaxLength()) {
+			area.setText(area.getText().substring(area.getText().length()/2));
+		}
+		
+		area.appendText(String.valueOf((char)b));
+		area.setCursorAtTextEnd();
+	}
+
+}

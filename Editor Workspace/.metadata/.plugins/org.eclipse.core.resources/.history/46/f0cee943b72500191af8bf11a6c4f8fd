@@ -1,0 +1,11 @@
+package br.com.lunacore.lunalire;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+public abstract class LireComponent {
+
+	public abstract void create();
+	public abstract void render(SpriteBatch sb);
+	public abstract void update(float delta);
+	public abstract void dispose();
+}

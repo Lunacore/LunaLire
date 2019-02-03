@@ -1,0 +1,25 @@
+package br.com.lunacore.lunalire;
+
+public class LunaLireStarter {
+
+	public void init() {
+		
+	}
+	
+	public void addState() {
+		
+	}
+	
+	public void create() {
+		
+	}
+	
+	public void render() {
+		
+	}
+	
+	public void dispose() {
+		
+	}
+	
+}

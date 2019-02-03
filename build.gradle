@@ -1,0 +1,83 @@
+apply plugin: 'java'
+
+task createProject{
+
+	ext.getGroupName = { name ->
+		return name.toLowerCase().trim().replace(" ", "-")
+	}
+	
+	ext.getClassName = { name ->
+		def finalString = ""
+		name.split("\\s+").each{
+			def c = it.toLowerCase()
+			c = "${c.charAt(0).toUpperCase()}${c.substring(1)}"
+			finalString = "$finalString$c"
+		}
+		return finalString
+	}
+	
+	ext.replaceInFile = {file, src, dst ->
+		ant.replace(file: file, token: src, value: dst)
+	}
+
+	doLast{
+		println 'Project name: '
+		def projectName = System.in.newReader().readLine()
+		println "Project is: $projectName"
+		println "Group name is: ${getGroupName(projectName)}"
+		println "Class name is: ${getClassName(projectName)}"
+		
+		def workspaceFolderPath = "$projectName Workspace"
+		def projectFolderPath = "$workspaceFolderPath/$projectName"
+		
+		def enabled = !file("$workspaceFolderPath").exists() 
+		
+		while (!enabled) {
+			println 'Project already exists! Type new name: '
+			projectName = System.in.newReader().readLine()
+			
+			workspaceFolderPath = "$projectName Workspace"
+			projectFolderPath = "$workspaceFolderPath/$projectName"
+			
+			enabled = !file("$workspaceFolderPath").exists() 
+		}
+		
+		mkdir "$projectFolderPath"
+		
+		println "Copying into $projectFolderPath"
+		
+		copy {
+			from "DefaultProject/DefaultProject"
+			into "$projectFolderPath"
+			rename 'DesktopLauncher.java', "${getClassName(projectName)}Launcher.java"
+			rename 'MyGdxGame.java', "${getClassName(projectName)}.java"
+		}
+		
+		//project root
+		replaceInFile("$projectFolderPath/build.gradle", 'default-game', "${getGroupName(projectName)}")
+		replaceInFile("$projectFolderPath/.project", 'DefaultProject', "${projectName}")
+
+		mkdir "$workspaceFolderPath/.metadata"
+
+		copy {
+			from "META"
+			into "$workspaceFolderPath/.metadata"
+		}
+		//project core
+		replaceInFile("$projectFolderPath/core/.project", 'default-game', "${getGroupName(projectName)}")
+		replaceInFile("$projectFolderPath/core/src/br/com/lunacore/${getClassName(projectName)}.java", 'MyGdxGame', "${getClassName(projectName)}")
+
+		//project desktop
+		replaceInFile("$projectFolderPath/desktop/.project", 'default-game', "${getGroupName(projectName)}")
+		replaceInFile("$projectFolderPath/desktop/src/com/mygdx/game/desktop/${getClassName(projectName)}Launcher.java", 'DesktopLauncher', "${getClassName(projectName)}Launcher")
+		replaceInFile("$projectFolderPath/desktop/src/com/mygdx/game/desktop/${getClassName(projectName)}Launcher.java", 'MyGdxGame', "${getClassName(projectName)}")
+		
+		exec {
+			commandLine 'load.bat'
+			args = ["$workspaceFolderPath", "${projectFolderPath}/core/src/br/com/lunacore/${getClassName(projectName)}.java"]
+		}
+
+	}
+	
+	
+}

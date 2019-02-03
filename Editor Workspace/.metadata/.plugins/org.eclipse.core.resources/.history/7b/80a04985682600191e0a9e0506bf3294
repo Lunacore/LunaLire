@@ -1,0 +1,35 @@
+<scene name="Cena 1" ID="0">
+	<object z="0" name="Atumalaca">
+		<transform>
+			<position x="-438.36023" y="-144.944"/>
+			<rotation value="45.0"/>
+			<scale x="10.0" y="10.0"/>
+		</transform>
+		<component class="br.com.lunacore.lunalire.components.SpriteComponent">
+			<sprite loc="negresco.png" flipX="false" flipY="false"/>
+		</component>
+	</object>
+	<object z="0" name="Atumalaca">
+		<transform>
+			<position x="253.3412" y="-60.24774"/>
+			<rotation value="34.0"/>
+			<scale x="1.0" y="1.0"/>
+		</transform>
+		<component class="br.com.lunacore.lunalire.components.SpriteComponent">
+			<sprite loc="sidney.png" flipX="false" flipY="false"/>
+		</component>
+	</object>
+	<object z="0" name="Camera">
+		<transform>
+			<position x="-805.2684" y="162.55135"/>
+			<rotation value="0.0"/>
+			<scale x="1.0" y="1.0"/>
+		</transform>
+		<component>
+			<viewport zoom="1.0" width="1280.0" height="720.0"/>
+		</component>
+		<component>
+			<viewport zoom="1.0" width="1280.0" height="720.0"/>
+		</component>
+	</object>
+</scene>

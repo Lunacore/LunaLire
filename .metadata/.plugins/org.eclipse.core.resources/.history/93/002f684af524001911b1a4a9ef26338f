@@ -1,0 +1,32 @@
+package br.com.lunacore.helper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+public class MultiInputStreamReader extends InputStreamReader{
+	InputStreamReader[] streams;
+
+	public MultiInputStreamReader(InputStreamReader... in) {
+		super(null);
+		this.streams = in;
+	}
+
+	@Override
+	public int read(char[] cbuf) throws IOException {
+		for(InputStreamReader is : streams) {
+			is.read(cbuf);
+		}
+		return streams[0].read(cbuf);
+	}
+	
+	@Override
+	public int read(char[] cbuf, int offset, int length) throws IOException {
+		for(InputStreamReader is : streams) {
+			is.read(cbuf, offset, length);
+		}
+		return streams[0].read(cbuf, offset, length);
+	}
+	
+
+}

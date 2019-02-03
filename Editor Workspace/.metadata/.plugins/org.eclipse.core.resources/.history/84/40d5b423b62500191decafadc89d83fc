@@ -1,0 +1,183 @@
+package br.com.lunacore;
+
+import java.io.File;
+import java.io.FileFilter;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.kotcrab.vis.ui.widget.VisDialog;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
+import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
+import com.kotcrab.vis.ui.widget.file.FileChooserListener;
+
+import br.com.lunacore.custom.EditorWindow;
+import br.com.lunacore.states.State;
+import br.com.lunacore.ui.ClassListUI;
+import br.com.lunacore.ui.ClassPropertyUI;
+import br.com.lunacore.ui.FileExplorer;
+import br.com.lunacore.ui.SceneManager;
+import br.com.lunacore.ui.TopBar;
+
+public class UIState extends State{
+
+	Stage stage;
+	VisTable root;
+	ClassListUI classList;
+	ClassPropertyUI classProperties;
+	FileExplorer explorer;
+	EditorWindow classWindow;
+	EditorWindow classPropWindow;
+	EditorWindow explorerWindow;
+	SceneManager sceneManager;
+	
+	public void create() {
+		super.create();
+		stage = new Stage(new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		//stage.setDebugAll(true);
+
+		
+		root = new VisTable();
+		stage.addActor(root);
+		root.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Gdx.input.setInputProcessor(stage);
+
+		createMainPanel();
+		insertIntoMainPanel();
+	}
+	
+	public void resize(int width, int height) {
+		stage = new Stage(new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		root = new VisTable();
+		stage.addActor(root);
+		root.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Gdx.input.setInputProcessor(stage);
+
+		
+		insertIntoMainPanel();
+
+	}
+	
+
+	
+	public void openProjectMenu() {
+		FileChooser chooser = new FileChooser(Editor.getLunaLireRootFolder(), Mode.OPEN);
+		chooser.setFileFilter(new FileFilter() {
+			public boolean accept(File pathname) {
+				return pathname.getName().endsWith(".ll") || pathname.isDirectory();
+			}
+		});
+		chooser.setListener(new FileChooserListener() {
+			public void selected(Array<FileHandle> files) {
+				Editor.getInstance().setCurrentProject(files.get(0).parent());
+				sceneManager.loadClasses();
+				Editor.getInstance().refreshClassList();
+			}
+
+			public void canceled() {
+				
+			}
+		});
+		Editor.getInstance().addActor(chooser);
+	}
+	
+	public void insertIntoMainPanel() {
+		root.add(new TopBar(this).getTable()).fillX().expandX().row();
+		root.add(new VisTable()).grow();
+		stage.addActor(classWindow);
+		stage.addActor(classPropWindow);
+		stage.addActor(explorerWindow);
+	}
+	
+	public void createMainPanel() {
+		classList = new ClassListUI(this);
+		classProperties = new ClassPropertyUI(this);
+		sceneManager = new SceneManager(this);
+		
+		//16, 240
+		classWindow = new EditorWindow("Class list", true);
+		classWindow.addCloseButton();
+		classWindow.add(classList).grow();
+		classWindow.setPosition(16, 240);
+		classWindow.setSize(250, 450);
+		classWindow.setResizable(true);
+		classWindow.setPosition(10, Gdx.graphics.getHeight());
+		
+		//980, 230
+		classPropWindow = new EditorWindow("Class properties");
+		classPropWindow.addCloseButton();
+		classPropWindow.setPosition(980, 230);
+		classPropWindow.setSize(250, 450);
+		classPropWindow.add(classProperties).grow();
+		classPropWindow.setResizable(true);
+		
+		explorer = new FileExplorer(this);
+		explorerWindow = new EditorWindow("Explorer");
+		explorerWindow.addCloseButton();
+		explorerWindow.setSize(700, 250);
+		explorerWindow.add(explorer).grow();
+		explorerWindow.setResizable(true);
+	}
+	
+	public void addActor(Actor actor) {
+		stage.addActor(actor);
+	}
+
+	public void refreshClassList() {
+		classList.refresh();
+		explorer.refresh();
+	}
+	
+	public void refreshClassProperties() {
+		classProperties.refresh();
+	}
+	
+	
+	public void enter() {
+		
+	}
+	
+	public void setClassSelected(FileHandle handle) {
+		classProperties.setClassSelection(handle);
+	}
+
+	public void render(SpriteBatch sb) {
+		stage.draw();
+	}
+
+	public void update(float delta) {
+		stage.act(delta);
+	}
+
+	public void openClassListWindow() {
+		if(!classWindow.isOpen()) {
+			stage.addActor(classWindow);
+			classWindow.open();
+		}
+	}
+	
+	public void openClassPropertiesWindow() {
+		if(!classPropWindow.isOpen()) {
+			stage.addActor(classPropWindow);
+			classPropWindow.open();
+		}		
+	}
+
+	public void openAssetExplorerWindow() {
+		if(!explorerWindow.isOpen()) {
+			stage.addActor(explorerWindow);
+			explorerWindow.open();
+		}				
+	}
+
+	public void addDialog(VisDialog dialog) {
+		stage.addActor(dialog);
+	}
+
+}

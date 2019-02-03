@@ -1,0 +1,11 @@
+package br.com.lunacore.custom;
+
+public class ObjectPresets {
+	
+	public static LireObject getSpritePreset(FileHandle sprite) {
+		
+		return null;
+	}
+	
+
+}

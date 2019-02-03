@@ -1,0 +1,30 @@
+package br.com.lunacore.custom;
+
+import java.util.HashMap;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.XmlReader.Element;
+
+import br.com.lunacore.lunalire.LireObject;
+import br.com.lunacore.lunalire.LireScene;
+
+public class EditorLireObject extends LireObject{
+	
+	//Esses dois são mais usados pelo editor
+	//já q no editor eu n preciso criar uma INSTANCIA da classe
+	//mas eu preciso saber qual classe q é de qqr forma (e os parametros)
+	private Class childClass;
+	private HashMap<String, String> childParams;
+	protected Rectangle limits;
+	private boolean visible = true;
+	boolean lock;
+
+	public EditorLireObject(Element root, FileHandle assetsFolder, LireScene scene) {
+		super(root, assetsFolder, scene);
+		childParams = new HashMap<String, String>();
+		limits = new Rectangle(-25, -25, 50, 50);
+
+	}
+	
+}

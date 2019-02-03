@@ -1,0 +1,15 @@
+1548987945357	Encapsulate field 'cenario'
+1548991351613	Delete element
+1548991359404	Rename resource 'file (1).png'
+1549019205848	Rename field 'minSelection'
+1549019210741	Rename field 'maxSelection'
+1549020398561	Rename method 'unselect'
+1549043089600	Delete element
+1549063988360	Rename local variable 'spriteLoc'
+1549066398608	Rename method 'loadClasses'
+1549067833529	Rename local variable 'spriteLoc'
+1549127731636	Rename local variable 'windowObjectProperties1'
+1549128982453	Rename local variable 'newScene'
+1549134258995	Delete elements
+1549134574911	Delete elements
+1549140416659	Rename resource 'fragment.fs'

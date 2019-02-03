@@ -1,0 +1,25 @@
+package br.com.lunacore.lunalire;
+
+import java.util.HashMap;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+public class LireStateManager {
+	
+	HashMap<Integer, LireScene> scenes;	
+	int currentScene;
+	
+	public void render(SpriteBatch batch) {
+		
+	}
+
+	public void update(float delta) {
+		
+	}
+
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

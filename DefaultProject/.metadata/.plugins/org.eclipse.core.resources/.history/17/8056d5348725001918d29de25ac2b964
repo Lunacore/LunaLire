@@ -1,0 +1,27 @@
+package br.com.lunacore.lunalire;
+
+public class LunaLireStarter {
+
+	//Puxar todos os arquivos da pasta SRC e tacar pra carregar no AssetManager
+	
+	public void init() {
+		
+	}
+	
+	public void addState() {
+		
+	}
+	
+	public void create() {
+		
+	}
+	
+	public void render() {
+		
+	}
+	
+	public void dispose() {
+		
+	}
+	
+}

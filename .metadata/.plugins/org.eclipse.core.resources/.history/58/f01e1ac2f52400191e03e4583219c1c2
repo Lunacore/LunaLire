@@ -1,0 +1,20 @@
+package br.com.lunacore.helper;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
+public class MultiBufferedReader extends BufferedReader{
+
+	public MultiBufferedReader(Reader in) {
+		super(in);
+	}
+	
+	@Override
+	public String readLine() throws IOException {
+		return super.readLine();
+	}	
+
+}

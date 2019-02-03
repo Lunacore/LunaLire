@@ -1,0 +1,24 @@
+package br.com.lunacore;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.XmlReader.Element;
+
+import br.com.lunacore.lunalire.LireObject;
+import br.com.lunacore.lunalire.LireScene;
+
+public class MyObject extends LireObject{
+	
+	public String atelamenumano;
+
+	public MyObject(Element root, FileHandle assetsFolder, LireScene scene) {
+		super(root, assetsFolder, scene);
+	}
+		
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+		getTransform().setAngle(getTransform().getAngle());
+	}
+
+}

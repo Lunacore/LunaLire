@@ -1,0 +1,106 @@
+package br.com.lunacore.ui;
+
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.kotcrab.vis.ui.widget.Menu;
+import com.kotcrab.vis.ui.widget.MenuBar;
+import com.kotcrab.vis.ui.widget.MenuItem;
+
+import br.com.lunacore.UIState;
+
+public class TopBar extends MenuBar{
+	
+	UIState state;
+	
+	public TopBar(final UIState state) {
+		super();
+		this.state = state;
+		
+		createFile();
+		createWindow();
+		createBuildRun();
+		
+	}
+	
+	public void createBuildRun() {
+		
+		Menu buildRun = new Menu("Build/Run");
+		buildRun.addItem(new MenuItem("Run"));
+		buildRun.addItem(new MenuItem("Build"));
+
+		addMenu(buildRun);
+	}
+	
+	public void createFile() {
+		//File
+				Menu file = new Menu("File");
+				
+				MenuItem newProject = new MenuItem("New project");
+				//newProject.setShortcut(Keys.CONTROL_LEFT, Keys.N);
+				file.addItem(newProject);
+				
+				MenuItem openProject = new MenuItem("Open project");
+				openProject.addListener(new ClickListener() {
+					public void clicked(InputEvent event, float x, float y) {
+						state.openProjectMenu();
+					}
+				});
+				//openProject.setShortcut(Keys.CONTROL_LEFT, Keys.O);
+				file.addItem(openProject);
+				
+				MenuItem saveProject = new MenuItem("Save scene");
+				saveProject.addListener(new ClickListener() {
+					public void clicked(InputEvent event, float x, float y) {
+						state.saveProject();
+					}
+				});
+				//saveProject.setShortcut(Keys.CONTROL_LEFT, Keys.S);
+				file.addItem(saveProject);
+				addMenu(file);
+
+	}
+	
+	public void createWindow() {
+		//Window
+				Menu window = new Menu("Window");
+				
+				MenuItem windowClassList = new MenuItem("Class list");
+				windowClassList.addListener(new ClickListener() {
+					public void clicked(InputEvent event, float x, float y) {
+						state.openClassListWindow();
+					}
+				});
+				window.addItem(windowClassList);
+
+				
+				MenuItem windowClassProperties = new MenuItem("Class properties");
+				windowClassProperties.addListener(new ClickListener() {
+					public void clicked(InputEvent event, float x, float y) {
+						state.openClassPropertiesWindow();
+					}
+				});
+				window.addItem(windowClassProperties);
+				
+				MenuItem windowAssetExplorer = new MenuItem("Assets explorer");
+				windowAssetExplorer.addListener(new ClickListener() {
+					public void clicked(InputEvent event, float x, float y) {
+						state.openAssetExplorerWindow();
+					}
+				});
+				window.addItem(windowAssetExplorer);
+				
+				MenuItem windowObjectProperties = new MenuItem("Object properties");
+				windowObjectProperties.addListener(new ClickListener() {
+					public void clicked(InputEvent event, float x, float y) {
+						state.openObjectPropertiesWindow();
+					}
+				});
+				window.addItem(windowObjectProperties);
+				
+				addMenu(window);
+	}
+
+}

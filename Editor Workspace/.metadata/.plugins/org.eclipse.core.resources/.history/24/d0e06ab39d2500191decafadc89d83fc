@@ -1,0 +1,20 @@
+package br.com.lunacore.custom;
+
+import com.kotcrab.vis.ui.widget.VisDialog;
+import com.kotcrab.vis.ui.widget.VisTextField;
+
+public class StringInputDialog extends VisDialog{
+
+	String text;
+	
+	public StringInputDialog(String title) {
+		super(title);
+		
+		clear();
+		VisTextField field = new VisTextField();
+		
+	}
+	
+	
+
+}

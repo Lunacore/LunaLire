@@ -1,0 +1,6 @@
+.fs -> Fragment Shader
+.vs -> Vertex shader
+.scml -> Spriter project
+.lo -> LireObject
+.ls -> LireScene
+.tmx -> Tiled map

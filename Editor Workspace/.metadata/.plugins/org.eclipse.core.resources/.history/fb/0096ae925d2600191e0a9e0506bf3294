@@ -1,0 +1,33 @@
+package br.com.lunacore.lunalire;
+
+import java.util.HashMap;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.XmlReader;
+
+public class LireStateManager {
+	
+	HashMap<Integer, LireScene> scenes;	
+	int currentScene;
+	
+	public LireStateManager() {
+		XmlReader reader = new XmlReader();
+		Element root = reader.parse("project.ll");
+		
+		//Carrega as cenas a partir do arquivo .ll
+		
+	}
+	
+	public void render(SpriteBatch batch) {
+		
+	}
+
+	public void update(float delta) {
+		
+	}
+
+	public void dispose() {
+		
+	}
+
+}

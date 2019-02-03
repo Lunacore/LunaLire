@@ -1,0 +1,34 @@
+package br.com.lunacore.lunalire;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+public class LunaLireStarter {
+
+	//Puxar todos os arquivos da pasta SRC e tacar pra carregar no AssetManager
+	
+	static SpriteBatch batch;
+	static LireStateManager manager;
+
+	
+	public static void init() {
+		batch = new SpriteBatch();
+		manager = new LireStateManager();
+	}
+	
+	public static void addState() {
+		
+	}
+	
+	public static void create() {
+		
+	}
+	
+	public static void render() {
+		
+	}
+	
+	public static void dispose() {
+		
+	}
+	
+}

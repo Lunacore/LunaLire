@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.Drawable"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.SpriteBatch"/>
 <fullyQualifiedTypeName name="br.com.lunacore.ui.LireSceneViewport.ManipulationMode"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShaderProgram"/>
@@ -60,4 +59,5 @@
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Camera"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.math.Vector3"/>
 <fullyQualifiedTypeName name="br.com.lunacore.Editor"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.utils.IntMap"/>
 </qualifiedTypeNameHistroy>

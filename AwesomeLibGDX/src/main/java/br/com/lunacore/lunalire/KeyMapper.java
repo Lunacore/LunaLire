@@ -11,15 +11,16 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.IntMap;
 
 import br.com.lunacore.input.XBoxController;
 
 public class KeyMapper implements InputProcessor, ControllerListener{
 	
 	LireStateManager manager;
-	
-	HashMap<String, ArrayList<KeyMap>> keymaps;
-	HashMap<String, ArrayList<AxisMap>> axismaps;
+		
+	IntMap<String> keyboardMaps;
+	IntMap<String> controllerMaps;
 	
 	HashMap<String, Boolean> inputStates;
 	
@@ -28,9 +29,9 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 		Gdx.input.setInputProcessor(this);
 		Controllers.addListener(this);
 		
-		keymaps = new HashMap<String,ArrayList<KeyMap>>();
-		axismaps = new HashMap<String, ArrayList<AxisMap>>();
-		
+		keyboardMaps = new IntMap<String>();
+		controllerMaps = new IntMap<String>();
+				
 		inputStates = new HashMap<String, Boolean>();
 	}
 	
@@ -43,21 +44,18 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 	}
 	
 	public void registerKeyMap(String name, Device device, int keycode) {
-		if(keymaps.get(name) == null){
-			keymaps.put(name, new ArrayList<KeyMapper.KeyMap>());
-			inputStates.put(name, false);
+		if(device == Device.KEYBOARD) {
+			keyboardMaps.put(keycode, name);
 		}
-		
-		if(!arrayContainsKey(keymaps.get(name), device, keycode)) {
-			keymaps.get(name).add(new KeyMap(device, keycode));
+		else if(device == Device.CONTROLLER) {
+			controllerMaps.put(keycode, name);
 		}
 	}
 
 	public boolean keyDown(int keycode) {
-		//Dispara os keymaps que usam esse codigo
-		for(String key : findKeyMaps(Device.KEYBOARD, keycode)) {
-			inputIn(Device.KEYBOARD, key);
-			inputStates.put(key, true);
+		if(keyboardMaps.get(keycode, null) != null) {
+			inputIn(Device.KEYBOARD, keyboardMaps.get(keycode));
+			inputStates.put(keyboardMaps.get(keycode), true);
 		}
 		
 		manager.keyDown(keycode);
@@ -65,11 +63,11 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 	}
 
 	public boolean keyUp(int keycode) {
-		//Dispara os keymaps que usam esse codigo
-		for(String key : findKeyMaps(Device.KEYBOARD, keycode)) {
-			inputOut(Device.KEYBOARD, key);
-			inputStates.put(key, false);
+		if(keyboardMaps.get(keycode, null) != null) {
+			inputOut(Device.KEYBOARD, keyboardMaps.get(keycode));
+			inputStates.put(keyboardMaps.get(keycode), false);
 		}
+		
 		manager.keyUp(keycode);
 		return false;
 	}
@@ -113,10 +111,9 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 	}
 
 	public boolean buttonDown(Controller controller, int buttonCode) {
-		//Dispara os keymaps que usam esse codigo
-		for(String key : findKeyMaps(Device.CONTROLLER, buttonCode)) {
-			inputIn(Device.CONTROLLER, key);
-			inputStates.put(key, true);
+		if(controllerMaps.get(buttonCode, null) != null) {
+			inputIn(Device.KEYBOARD, controllerMaps.get(buttonCode));
+			inputStates.put(controllerMaps.get(buttonCode), true);
 		}
 				
 		manager.buttonDown(controller, buttonCode);
@@ -124,10 +121,9 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 	}
 
 	public boolean buttonUp(Controller controller, int buttonCode) {
-		//Dispara os keymaps que usam esse codigo
-		for(String key : findKeyMaps(Device.CONTROLLER, buttonCode)) {
-			inputOut(Device.CONTROLLER, key);
-			inputStates.put(key, false);
+		if(controllerMaps.get(buttonCode, null) != null) {
+			inputOut(Device.KEYBOARD, controllerMaps.get(buttonCode));
+			inputStates.put(controllerMaps.get(buttonCode), false);
 		}
 		
 		manager.buttonUp(controller, buttonCode);
@@ -139,8 +135,7 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 		return false;
 	}
 	
-	int lastPovPressed = XBoxController.POV_CENTER;
-
+	//TODO: ajeitar isso aqui
 	public boolean povMoved(Controller controller, int povCode, PovDirection value) {
 		
 		if(
@@ -178,27 +173,9 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 	}
 	
 	public void handlePov(int povcode) {
-		if(povcode != lastPovPressed && lastPovPressed != XBoxController.POV_CENTER) {
-			
-			//Dispara os keymaps que usam esse codigo
-			for(String key : findKeyMaps(Device.CONTROLLER, lastPovPressed)) {
-				inputOut(Device.CONTROLLER, key);
-				inputStates.put(key, false);
-			}
-			
-			
+		if(controllerMaps.get(povcode, null) != null) {
+			inputIn(Device.KEYBOARD, controllerMaps.get(povcode));
 		}
-		else{
-			//Dispara os keymaps que usam esse codigo
-			for(String key : findKeyMaps(Device.CONTROLLER, povcode)) {
-				inputIn(Device.CONTROLLER, key);
-				inputStates.put(key, true);
-			}
-		}
-		
-		lastPovPressed = povcode;
-		
-		
 	}
 	
 	public int getPov(PovDirection pov) {
@@ -233,18 +210,7 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 	public void inputOut(Device device, String mapName) {
 		manager.inputOut(device, mapName);
 	}
-	
-	public ArrayList<String> findKeyMaps(Device device, int keycode){
-		ArrayList<String>  ret = new ArrayList<String>();
-		for(String mapName : keymaps.keySet()) {
-			
-			if(arrayContainsKey(keymaps.get(mapName), device, keycode)) {
-				ret.add(mapName);
-			}
-			
-		}
-		return ret;
-	}
+
 	
 	public boolean arrayContainsKey(ArrayList<KeyMap> list, Device device, int keycode) {
 		for(KeyMap k : list) {
@@ -280,16 +246,5 @@ public class KeyMapper implements InputProcessor, ControllerListener{
 			this.device = device;
 			this.axisCode = axisCode;
 		}
-	}
-
-	public void releaseAll() {
-		for(String s : keymaps.keySet()) {
-			for(KeyMap k : keymaps.get(s)) {
-				inputOut(k.device, s);
-			}
-		}
-	}
-
-	
-	
+	}	
 }

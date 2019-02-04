@@ -7,10 +7,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -26,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -101,7 +104,7 @@ public class LireSceneViewport extends Stage{
 		objectsInScene = new ArrayList<EditorLireObject>();
 		localSelection = new ArrayList<EditorLireObject>();
 		//cenario
-		cenario = new EditorLireObject(null, null, null);
+		cenario = new EditorLireObject(null, null, null, this);
 		
 		cenario.getTransform().setPosition(0, 0);
 		cenario.addListener(new ClickListener() {
@@ -258,26 +261,31 @@ public class LireSceneViewport extends Stage{
 	
 			screenSelection.set(minX, minY, maxX - minX, maxY - minY);
 			
+			sr.setColor(Color.WHITE);
 			sr.rect(minX, minY, maxX - minX, maxY - minY);
 
 			localSelection.clear();
 			
+			sr.setColor(Color.RED);
 			//Actor bounds are in UICam
 			for(EditorLireObject ob : objectsInScene) {
 				Rectangle r = new Rectangle(ob.getX(), Gdx.graphics.getHeight() - ob.getY() - ob.getHeight(), ob.getWidth(), ob.getHeight());
 								
 				if(r.overlaps(screenSelection)) {
 					localSelection.add(ob);
+					sr.rect(r.x, r.y, r.width, r.height);
 				}
 			}
 		}
-		
-		for(EditorLireObject ob : Editor.getInstance().getSelectedObjects()) {
-			Rectangle r = new Rectangle(ob.getX(), Gdx.graphics.getHeight() - ob.getY() - ob.getHeight(), ob.getWidth(), ob.getHeight());
-			sr.rect(r.x, r.y, r.width, r.height);
-		}
-			
+		sr.setColor(Color.WHITE);
 		sr.end();
+		
+		//Placeholder
+		getBatch().setProjectionMatrix(getCamera().combined);
+		for(EditorLireObject ob : Editor.getInstance().getSelectedObjects()) {
+			ob.drawSelected(getBatch(), worldCamera);
+		}
+		
 
 		//I need to draw all the LireObjects using WorldCam
 		getBatch().setProjectionMatrix(worldCamera.combined);
@@ -431,14 +439,13 @@ public class LireSceneViewport extends Stage{
 						switch(manipulationMode) {
 						case TRANSLATE:
 							for(EditorLireObject l : Editor.getInstance().getSelectedObjects()) {
-								if(l.getLireParent() != null) 
-									l.getTransform().getPosition().add(
-											dx / l.getLireParent().getTransform().getScale().x,
-											-dy / l.getLireParent().getTransform().getScale().y);
 								
-								else { 
-									l.getTransform().getPosition().add(dx * worldCamera.zoom, -dy * worldCamera.zoom);
-								}
+								Vector2 targetPosition = l.getFinalTransform().getPosition().cpy().add(
+										dx * worldCamera.zoom,
+										-dy * worldCamera.zoom);
+											
+								l.getTransform().setPosition(l.projectPosition(targetPosition, new Vector2()));
+								
 							}
 							break;
 						case ROTATE:
@@ -460,26 +467,28 @@ public class LireSceneViewport extends Stage{
 						case SCALE:
 							for(EditorLireObject l : Editor.getInstance().getSelectedObjects()) {
 								
-								//Vector2 rotated = new Vector2(dx, dy).scl(1/200f); //Modo absoluto
-								Vector2 rotated = new Vector2(dx, dy).rotate(-l.getFinalTransform().getAngle()).scl(1/200f);
-								//startDragPoint is also in ScreenCam
-								//We are using case, so previews declared variables also exists here
-								worldMousePos = worldCamera.unproject(new Vector3(startDragPoint, 0));
+								//Not working the way i want
 								
-								Vector2 at = Helper.xy(worldMousePos).cpy().sub(lr.getFinalTransform().getPosition());
-								if(at.x < 0) {
-									rotated.x = -rotated.x;
-								}
-								if(at.y > 0) {
-									rotated.y = -rotated.y;
-								}
-								
-								if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
-									rotated.x = Math.max(rotated.x, rotated.y);
-									rotated.y = rotated.x;
-								}
-								
-								l.getTransform().getScale().add(rotated);
+//								//Vector2 rotated = new Vector2(dx, dy).scl(1/200f); //Modo absoluto
+//								Vector2 rotated = new Vector2(dx, dy).rotate(-l.getFinalTransform().getAngle()).scl(1/200f);
+//								//startDragPoint is also in ScreenCam
+//								//We are using case, so previews declared variables also exists here
+//								worldMousePos = worldCamera.unproject(new Vector3(startDragPoint, 0));
+//								
+//								Vector2 at = Helper.xy(worldMousePos).cpy().sub(lr.getFinalTransform().getPosition());
+//								if(at.x < 0) {
+//									rotated.x = -rotated.x;
+//								}
+//								if(at.y > 0) {
+//									rotated.y = -rotated.y;
+//								}
+//								
+//								if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
+//									rotated.x = Math.max(rotated.x, rotated.y);
+//									rotated.y = rotated.x;
+//								}
+//								
+//								l.getTransform().getScale().add(rotated);
 							}
 							break;
 						}
@@ -542,18 +551,19 @@ public class LireSceneViewport extends Stage{
 		objectsInScene.remove(obj);
 		obj.remove();
 		Editor.getInstance().unselect(obj);
+		Editor.getInstance().getUIState().refreshObjectHierarchy();
 		Editor.getInstance().getUIState().getSceneManager().unsave();
 	}
 	
 	public EditorLireObject loadObject(FileHandle handle, float x, float y) {
-		final EditorLireObject lr = new EditorLireObject(new XmlReader().parse(handle), Editor.getInstance().getCurrentProject().child("core/assets"), null);
+		final EditorLireObject lr = new EditorLireObject(new XmlReader().parse(handle), Editor.getInstance().getCurrentProject().child("core/assets"), null, this);
 		//Here i need to put the object in the mouse position, so here we go again
 		Vector3 worldPos = worldCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 		lr.getTransform().setPosition(worldPos.x, worldPos.y);
 		return lr;
 	}
 	
-	//TODO: Meta functions
+	//TODO: Specific sittuation functions (mostly used just once in the code, but to big to be put where it should be)
 	public void addTargetToCenario() {
 		Editor.getInstance().getDragAndDrop().addTarget(new Target(cenario) {
 			public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
@@ -571,10 +581,12 @@ public class LireSceneViewport extends Stage{
 					if(fh.name().endsWith(".lo")) {
 						addLireObject(Editor.getInstance().getStage().loadObject(fh, Gdx.input.getX(), Gdx.input.getY()));
 						Editor.getInstance().getUIState().getSceneManager().unsave();
+						Editor.getInstance().getUIState().refreshObjectHierarchy();
 					}
 					else if(fh.name().endsWith(".png") || fh.name().endsWith(".jpg")) {
 						addLireObject(ObjectPresets.getSpritePreset(fh));
 						Editor.getInstance().getUIState().getSceneManager().unsave();
+						Editor.getInstance().getUIState().refreshObjectHierarchy();
 					}
 				}
 			}
@@ -591,6 +603,7 @@ public class LireSceneViewport extends Stage{
 						obj.getChildClass().getField(s);
 					}catch(NoSuchFieldException e) {
 						obj.setParam(s, null);
+						//Learn portuguese
 						System.out.println("Achei um campo que não existe mais na classe: " + s);
 					}
 				}
@@ -598,6 +611,7 @@ public class LireSceneViewport extends Stage{
 				for(Field f : obj.getChildClass().getFields()) {
 					if(obj.getParam(f.getName()) == null) {
 						obj.setParam(f.getName(), "");
+						//Brazilian, not Portugal
 						System.out.println("Achei um campo q existe na classe mas nao existe ainda no obj: " + f.getName());
 					}
 				}
@@ -613,6 +627,8 @@ public class LireSceneViewport extends Stage{
 	//TODO: Input Handling
 	@Override
 	public boolean keyDown(int keyCode) {
+		
+		
 		if(keyCode == Keys.FORWARD_DEL) {
 			ArrayList<EditorLireObject> objects = Editor.getInstance().getSelectedObjects();
 			for(int i = objects.size() - 1; i >= 0; i --) {
@@ -685,6 +701,11 @@ public class LireSceneViewport extends Stage{
 
 		return super.scrolled(amount);
 	}
+
+	public Camera getWorldCamera() {
+		return worldCamera;
+	}
+
 
 
 }

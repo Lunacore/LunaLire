@@ -74,6 +74,45 @@ public class LireObject extends Actor{
 		}
 	}
 	
+	/**
+	 * This method is made to translate an object attached to a parent
+	 * based on an absolute position.
+	 * 
+	 * You input in the desired absolute position in world units, and
+	 * it returns the local position this objects need to be for it
+	 * to be rendered at the target position
+	 * 
+	 * @param finalTarget the position in world units you want your object to be rendered
+	 * @return the local position this objects need to be
+	 */
+	public Vector2 projectPosition(Vector2 finalTarget, Vector2 out) {
+		
+		if(getLireParent() == null) {
+			return out.set(finalTarget);
+		}
+		else {
+			return out.set(
+					finalTarget.cpy()
+					.sub(getLireParent().getFinalTransform().getPosition())
+					.rotate(- getLireParent().getFinalTransform().getAngle())
+					.scl(1/ getLireParent().getFinalTransform().getScale().x,
+							1/ getLireParent().getFinalTransform().getScale().y)
+					);
+		}
+		
+	}
+	
+	public Vector2 projectScale(Vector2 finalScale, Vector2 out) {
+		
+		if(getLireParent() == null) return out.set(finalScale);
+		 
+		return out.set(finalScale.cpy().scl(
+				1/getLireParent().getFinalTransform().getScale().x,
+				1/getLireParent().getFinalTransform().getScale().y
+				));
+		
+	}
+	
 	public void setZOrder(int zorder) {
 		this.zorder = zorder;
 		setZIndex(zorder);

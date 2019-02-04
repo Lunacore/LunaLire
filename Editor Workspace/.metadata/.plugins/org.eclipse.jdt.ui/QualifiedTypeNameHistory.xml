@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.EventListener"/>
-<fullyQualifiedTypeName name="br.com.lunacore.lunalire.LireComponent.RefreshEvent"/>
-<fullyQualifiedTypeName name="java.lang.Class"/>
-<fullyQualifiedTypeName name="br.com.lunacore.lunalire.components.ShapeRendererComponent"/>
-<fullyQualifiedTypeName name="br.com.lunacore.ui.ClassListUI"/>
-<fullyQualifiedTypeName name="br.com.lunacore.lunalire.LireComponent"/>
-<fullyQualifiedTypeName name="br.com.lunacore.custom.EditorWindow"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.ui.Dialog"/>
-<fullyQualifiedTypeName name="com.kotcrab.vis.ui.VisUI"/>
-<fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisLabel"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Texture"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.Drawable"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.ui.Image"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.SpriteBatch"/>
 <fullyQualifiedTypeName name="br.com.lunacore.ui.LireSceneViewport.ManipulationMode"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShaderProgram"/>
@@ -24,7 +11,6 @@
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType"/>
 <fullyQualifiedTypeName name="java.awt.Toolkit"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.math.Vector2"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.math.Rectangle"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.InputListener"/>
 <fullyQualifiedTypeName name="br.com.lunacore.input.KeyMapper"/>
 <fullyQualifiedTypeName name="br.com.lunacore.lunalire.LireStateManager"/>
@@ -40,13 +26,11 @@
 <fullyQualifiedTypeName name="br.com.lunacore.lunalire.LunaLireStarter"/>
 <fullyQualifiedTypeName name="java.lang.Exception"/>
 <fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisCheckBox"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.ChangeListener"/>
 <fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisTable"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.utils.Align"/>
 <fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisTree"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.ui.Tree.Node"/>
 <fullyQualifiedTypeName name="java.util.Stack"/>
-<fullyQualifiedTypeName name="br.com.lunacore.Editor"/>
 <fullyQualifiedTypeName name="br.com.lunacore.lunalire.LireObject"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.utils.XmlReader.Element"/>
 <fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisTextButton"/>
@@ -56,8 +40,24 @@
 <fullyQualifiedTypeName name="br.com.lunacore.ui.ObjectHierarchy"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.ClickListener"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.Gdx"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.Input.Keys"/>
 <fullyQualifiedTypeName name="br.com.lunacore.custom.EditorLireObject"/>
 <fullyQualifiedTypeName name="br.com.lunacore.ui.ObjectHierarchy.LireObjectLabel"/>
+<fullyQualifiedTypeName name="javax.swing.event.ChangeListener"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.ChangeListener"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.utils.viewport.Viewport"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.utils.viewport.ScreenViewport"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.TextureAtlas"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.Gdx"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.NinePatch"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.math.Rectangle"/>
+<fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisImageButton"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable"/>
+<fullyQualifiedTypeName name="br.com.lunacore.ui.LireSceneViewport"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.ui.Image"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.DragListener"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Camera"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.math.Vector3"/>
+<fullyQualifiedTypeName name="br.com.lunacore.Editor"/>
 </qualifiedTypeNameHistroy>

@@ -182,7 +182,7 @@ public class SceneManager extends VisTable{
 	}
 
 	private EditorLireObject loadObjElement(Element obj) {
-		EditorLireObject lr = new EditorLireObject(obj, Editor.getInstance().getCurrentProject().child("core/assets"), null);
+		EditorLireObject lr = new EditorLireObject(obj, Editor.getInstance().getCurrentProject().child("core/assets"), null, Editor.getInstance().getStage());
 		
 		Element custom = obj.getChildByName("custom");
 		if(custom != null) {

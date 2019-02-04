@@ -590,31 +590,31 @@ public class ShapeRendererComponent extends LireComponent{
 					height,
 					parent.getFinalTransform().getScale().x * shapeTransform.getScale().x,
 					parent.getFinalTransform().getScale().y * shapeTransform.getScale().y,
-					parent.getFinalTransform().getAngle() + shapeTransform.getAngle());
+					shapeTransform.getAngle());
 			
 			p0 = new Vector2(
 					-(width * parent.getFinalTransform().getScale().x * shapeTransform.getScale().x)/2f,
 					-(height * parent.getFinalTransform().getScale().y * shapeTransform.getScale().y)/2f
 					)
-					.rotate(parent.getFinalTransform().getAngle() + shapeTransform.getAngle())
+					.rotate(shapeTransform.getAngle())
 					.add(pt.x, pt.y);
 			p1 = new Vector2(
 					-(width * parent.getFinalTransform().getScale().x * shapeTransform.getScale().x)/2f,
 					(height * parent.getFinalTransform().getScale().y * shapeTransform.getScale().y)/2f
 					)
-					.rotate(parent.getFinalTransform().getAngle() + shapeTransform.getAngle())
+					.rotate(shapeTransform.getAngle())
 					.add(pt.x, pt.y);
 			p2 = new Vector2(
 					(width * parent.getFinalTransform().getScale().x * shapeTransform.getScale().x)/2f,
 					-(height * parent.getFinalTransform().getScale().y * shapeTransform.getScale().y)/2f
 					)
-					.rotate(parent.getFinalTransform().getAngle() + shapeTransform.getAngle())
+					.rotate(shapeTransform.getAngle())
 					.add(pt.x, pt.y);
 			p3 = new Vector2(
 					(width * parent.getFinalTransform().getScale().x * shapeTransform.getScale().x)/2f,
 					(height * parent.getFinalTransform().getScale().y * shapeTransform.getScale().y)/2f
 					)
-					.rotate(parent.getFinalTransform().getAngle() + shapeTransform.getAngle())
+					.rotate(shapeTransform.getAngle())
 					.add(pt.x, pt.y);
 		}
 		protected float maxY() {

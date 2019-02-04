@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import br.com.lunacore.input.KeyMapper;
 import br.com.lunacore.lunalire.KeyMapper.Device;
@@ -26,7 +27,6 @@ import br.com.lunacore.lunalire.components.CameraComponent;
 public class LireScene {
 	
 	ArrayList<LireObject> objects;
-	LireObject currentCamera;
 	Stage stage;
 	LireObject cameraActor;
 	
@@ -162,7 +162,7 @@ public class LireScene {
 
 	public void setCamera(OrthographicCamera camera2) {
 		stage.getViewport().setCamera(camera2);
-		stage.getViewport().apply();
+		stage.getViewport().setWorldSize(camera2.viewportWidth, camera2.viewportHeight);
 	}
 
 	public void dispose() {

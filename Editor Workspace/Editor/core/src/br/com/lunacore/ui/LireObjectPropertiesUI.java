@@ -85,6 +85,7 @@ public class LireObjectPropertiesUI extends VisTable{
 			nameTxt.addListener(new ChangeListener() {
 				public void changed(ChangeEvent event, Actor actor) {
 					obj.setName(nameTxt.getText());
+					Editor.getInstance().getUIState().refreshObjectHierarchy();
 				}
 			});
 			main.add(nameTxt).pad(10);

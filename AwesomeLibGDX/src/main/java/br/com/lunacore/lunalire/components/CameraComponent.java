@@ -1,9 +1,13 @@
 package br.com.lunacore.lunalire.components;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlReader.Element;
@@ -78,17 +82,44 @@ public class CameraComponent extends LireComponent{
 				
 		table.add(new VisLabel("Viewport width")).pad(5);
 		VisValidatableTextField widthTxt = new VisValidatableTextField(InputValidatorConstants.floatValidator);
+		widthTxt.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+			public void changed(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent event, Actor actor) {
+				if(widthTxt.isInputValid()) {
+					camera.viewportWidth = Float.parseFloat(widthTxt.getText());
+					camera.update();
+				}
+				
+			}
+		});
 		widthTxt.setText(camera.viewportWidth + "");
 		table.add(widthTxt).row();
 		
 		table.add(new VisLabel("Viewport height")).pad(5);
 		VisValidatableTextField heightTxt = new VisValidatableTextField(InputValidatorConstants.floatValidator);
 		heightTxt.setText(camera.viewportHeight + "");
+		heightTxt.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+			public void changed(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent event, Actor actor) {
+				if(heightTxt.isInputValid()) {
+					camera.viewportHeight = Float.parseFloat(heightTxt.getText());
+					camera.update();
+				}
+				
+			}
+		});
 		table.add(heightTxt).row();
 		
 		table.add(new VisLabel("Camera zoom")).pad(5);
 		VisValidatableTextField zoomTxt = new VisValidatableTextField(InputValidatorConstants.floatValidator);
 		zoomTxt.setText(camera.zoom + "");
+		zoomTxt.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+			public void changed(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent event, Actor actor) {
+				if(zoomTxt.isInputValid()) {
+					camera.zoom = Float.parseFloat(zoomTxt.getText());
+					camera.update();
+				}
+				
+			}
+		});
 		table.add(zoomTxt).row();
 		
 		return table;
@@ -115,8 +146,8 @@ public class CameraComponent extends LireComponent{
 	@Override
 	public Rectangle getLimits() {
 		limits.set(
-				parent.getFinalTransform().getPosition().x,
-				parent.getFinalTransform().getPosition().y,
+				-(camera.viewportWidth * parent.getFinalTransform().getScale().x)/2f + parent.getTransform().getPosition().x,
+				-(camera.viewportHeight * parent.getFinalTransform().getScale().y)/2f + parent.getTransform().getPosition().y,
 				camera.viewportWidth * parent.getFinalTransform().getScale().x,
 				camera.viewportHeight * parent.getFinalTransform().getScale().y
 				);

@@ -56,6 +56,7 @@ public class ObjectHierarchy extends VisTable{
 				endPoint.add(origin);
 				
 				//yup
+				if(drop.getObject().getLireParent() != null)
 				drop.getObject().getLireParent().removeChildren(drop.getObject());
 			}
 		});

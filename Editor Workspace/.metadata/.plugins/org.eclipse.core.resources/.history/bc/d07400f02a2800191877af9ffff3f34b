@@ -1,0 +1,15 @@
+
+selection.png
+size: 128,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+selection
+  rotate: false
+  xy: 2, 2
+  size: 100, 100
+  split: 5, 5, 5, 5
+  pad: 0, 0, 0, 0
+  orig: 100, 100
+  offset: 0, 0
+  index: -1

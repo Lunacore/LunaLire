@@ -6,12 +6,17 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="ld" key="selection"/>
+		<item value="toString" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="true" key="wholeword"/>
 		<list key="findhistory">
+			<item value="toString"/>
+			<item value="TRANSLATE"/>
+			<item value="DRAW"/>
+			<item value="target"/>
+			<item value="remove"/>
 			<item value="ld"/>
 			<item value="load"/>
 			<item value="save"/>
@@ -22,11 +27,6 @@
 			<item value="limits"/>
 			<item value="limit"/>
 			<item value="getLimit"/>
-			<item value="get"/>
-			<item value="getLimi"/>
-			<item value="Limits"/>
-			<item value="limi"/>
-			<item value="trick"/>
 		</list>
 		<list key="replacehistory">
 			<item value="Helper.projectIntoScreenPos(worldCamera"/>

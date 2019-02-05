@@ -1,0 +1,85 @@
+package br.com.lunacore.ui;
+
+import java.util.ArrayList;
+
+import com.kotcrab.vis.ui.widget.VisScrollPane;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextArea;
+
+public class ConsoleWindow extends VisTable{
+	
+	volatile VisTextArea area;
+	VisScrollPane pane;
+	volatile ArrayList<String> queue;
+	int maxLines = 100;
+	
+	public ConsoleWindow() {
+		super();
+		queue = new ArrayList<String>();
+		area = new VisTextArea();
+		//area.setDisabled(true);
+		area.getStyle().disabledFontColor.set(0.5f, 0.7f, 1f, 1);
+		
+		add(pane = new VisScrollPane(area)).grow().pad(10);
+		
+		pane.setSmoothScrolling(false);
+	}
+	
+	public VisTextArea getArea() {
+		return area;
+	}
+	
+	public synchronized void act(float delta) {
+		super.act(delta);
+
+		synchronized (queue) {
+			if(queue.size() > 0) {
+				for(String s : queue) {
+					area.appendText(s);
+				}
+				queue.clear();
+				
+				if(area.getLines() > maxLines) {
+					String[] splat = (String[]) splitByEnd(area.getText().split("\n"), maxLines);
+					
+					area.setText("");
+					for(String s : splat) {
+						area.appendText(s + "\n");
+					}
+				}
+				
+				area.setPrefRows(area.getLines()); 
+				area.setCursorAtTextEnd();
+				pane.setScrollPercentY(100);
+				pane.layout();
+			}
+			else {
+				area.setPrefRows(area.getLines()); 
+			}
+		}
+		
+	}
+	
+	private String removeLines(String text) {
+		while(text.endsWith("\n")) {
+			text = text.substring(0, text.length() - 1);
+		}
+		return text;
+	}
+	
+	public Object[] splitByEnd(Object[] array, int newSize) {
+		if(newSize < array.length) {
+			Object[] out = new Object[newSize];
+			
+			for(int i = 0; i < newSize; i ++) {
+				out[i] = array[array.length - newSize + i];
+			}
+			return out;
+		}
+		else return array;
+	}
+	
+	public synchronized void addText(String text) {
+		queue.add(text);
+	}
+}

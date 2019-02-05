@@ -1,0 +1,43 @@
+package br.com.lunacore.lunalire.utils;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+public class NinePatchLoader {
+	
+	public static NinePatch loadNinePatch(FileHandle handle) {
+		Pixmap pm = new Pixmap(handle);
+		
+		float originalWidth = pm.getWidth() - 2;
+		float originalHeigh = pm.getHeight() - 2;
+		
+		float leftWidth = 0;
+		float rightWidth = 0;
+		float topHeight = 0;
+		float bottomHeight = 0;
+		
+		Texture tex = new Texture(handle);
+		
+		NinePatch n = new NinePatch(
+				//Top
+				new TextureRegion(tex, 1, 1, leftWidth, topHeight),
+				new TextureRegion(tex, 1 + leftWidth, 1, originalWidth - leftWidth - rightWidth, topHeight),
+				new TextureRegion(tex, 1 + originalWidth - rightWidth, 1, rightWidth, topHeight),
+				
+				//Center
+				new TextureRegion(tex, 1, 1 + topHeight, leftWidth, originalHeigh - topHeight - bottomHeight),
+				new TextureRegion(tex, 1 + leftWidth, 1, originalWidth - leftWidth - rightWidth, topHeight),
+				new TextureRegion(tex, 1 + originalWidth - rightWidth, 1, rightWidth, topHeight),
+				
+				//Bottom
+				new TextureRegion(tex, 1, 1, leftWidth, topHeight),
+				new TextureRegion(tex, 1 + leftWidth, 1, originalWidth - leftWidth - rightWidth, topHeight),
+				new TextureRegion(tex, 1 + originalWidth - rightWidth, 1, rightWidth, topHeight)
+				);
+	}
+	
+
+}

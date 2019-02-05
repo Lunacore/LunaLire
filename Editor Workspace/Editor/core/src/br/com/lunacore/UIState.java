@@ -120,15 +120,10 @@ public class UIState extends State{
 	}
 	
 	public void printParallel(String text) {		
-//		try {
-//		console.getArea().appendText(text + "\n");
-//		}
-//		catch(Exception e) {
-//			System.out.println("err");
-//		}
-//		if(console.getArea().getText().length() > 2000) {
-//			console.getArea().setText(console.getArea().getText().substring(1000));
-//		}
+		synchronized(console) {
+			console.addText(text);
+		}
+		
 	}
 	
 	public void insertIntoMainPanel() {
@@ -191,9 +186,7 @@ public class UIState extends State{
 		consoleWindow.addCloseButton();
 		consoleWindow.setPosition(100, 100);
 		consoleWindow.setSize(700, 250);
-		VisScrollPane cpw = new VisScrollPane(console);
-		cpw.setFlickScroll(false);
-		consoleWindow.add(cpw).grow();
+		consoleWindow.add(console).grow();
 		consoleWindow.setResizable(true);
 		
 		hierarchyWindow = new EditorWindow("Object Hierarchy");

@@ -1,5 +1,6 @@
 package br.com.lunacore.ui;
 
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
@@ -145,14 +146,10 @@ public class LireSceneViewport extends Stage{
 				
 				//Actor bounds are in UICam
 				for(EditorLireObject ob : objectsInScene) {
-					
 					Rectangle r = new Rectangle(ob.getX(), Gdx.graphics.getHeight() - ob.getY() - ob.getHeight(), ob.getWidth(), ob.getHeight());
-
-					System.out.println("Checking bounds " + r + " and " + bounds);
 					
 					if(bounds.overlaps(r)) {
 						localSelection.add(ob);
-						System.out.println("Selecionou " + ob.getName());
 					}
 				}
 				
@@ -266,14 +263,12 @@ public class LireSceneViewport extends Stage{
 
 			localSelection.clear();
 			
-			sr.setColor(Color.RED);
 			//Actor bounds are in UICam
 			for(EditorLireObject ob : objectsInScene) {
 				Rectangle r = new Rectangle(ob.getX(), Gdx.graphics.getHeight() - ob.getY() - ob.getHeight(), ob.getWidth(), ob.getHeight());
 								
 				if(r.overlaps(screenSelection)) {
 					localSelection.add(ob);
-					sr.rect(r.x, r.y, r.width, r.height);
 				}
 			}
 		}
@@ -282,10 +277,15 @@ public class LireSceneViewport extends Stage{
 		
 		//Placeholder
 		getBatch().setProjectionMatrix(getCamera().combined);
-		for(EditorLireObject ob : Editor.getInstance().getSelectedObjects()) {
-			ob.drawSelected(getBatch(), worldCamera);
-		}
-		
+		for(EditorLireObject ob : getObjectsInScene()) {
+			if(Editor.getInstance().getSelectedObjects().contains(ob)) {
+				ob.setSelectionVisible(true);
+				ob.drawSelected(getBatch(), worldCamera);
+			}
+			else {
+				ob.setSelectionVisible(false);
+			}
+		}		
 
 		//I need to draw all the LireObjects using WorldCam
 		getBatch().setProjectionMatrix(worldCamera.combined);
@@ -550,6 +550,7 @@ public class LireSceneViewport extends Stage{
 		//cenario.removeChildren(obj);
 		objectsInScene.remove(obj);
 		obj.remove();
+		obj.dispose();
 		Editor.getInstance().unselect(obj);
 		Editor.getInstance().getUIState().refreshObjectHierarchy();
 		Editor.getInstance().getUIState().getSceneManager().unsave();

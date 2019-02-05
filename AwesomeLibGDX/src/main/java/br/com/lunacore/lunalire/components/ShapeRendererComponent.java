@@ -35,6 +35,7 @@ import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
 import br.com.lunacore.lunalire.LireComponent;
 import br.com.lunacore.lunalire.LireObject;
 import br.com.lunacore.lunalire.utils.InputValidatorConstants;
+import br.com.lunacore.lunalire.utils.UIConstants;
 import br.com.lunacore.math.Transform;
 
 public class ShapeRendererComponent extends LireComponent{

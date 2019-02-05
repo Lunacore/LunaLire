@@ -36,8 +36,8 @@ import br.com.lunacore.lunalire.LireObject;
 import br.com.lunacore.lunalire.components.CameraComponent;
 import br.com.lunacore.lunalire.components.ShapeRendererComponent;
 import br.com.lunacore.lunalire.components.SpriteComponent;
-import br.com.lunacore.lunalire.components.UIConstants;
 import br.com.lunacore.lunalire.utils.InputValidatorConstants;
+import br.com.lunacore.lunalire.utils.UIConstants;
 
 public class LireObjectPropertiesUI extends VisTable{
 	

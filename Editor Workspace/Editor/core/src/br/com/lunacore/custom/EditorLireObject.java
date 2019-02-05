@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
@@ -62,12 +63,12 @@ public class EditorLireObject extends LireObject{
 		
 		topLeft = new Image(invisible);
 		topLeft.setSize(20, 20);
-		topLeft.debug();
 		topLeft.addListener(new DragListener() {
 			
 			Vector3 newPos = new Vector3();
 			Vector3 oldPos = new Vector3();
-			
+			Vector3 unrotatednewPos = new Vector3();
+
 			public void drag(InputEvent event, float x, float y, int pointer) {
 				setTapSquareSize(0);
 				//ScreenCam
@@ -77,21 +78,38 @@ public class EditorLireObject extends LireObject{
 				//now its in WorldCam
 				stage.getWorldCamera().unproject(newPos);
 				
+				unrotatednewPos.set(newPos);
+				
+				//rotate to align angle
+				newPos
+				.sub(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0)
+				.rotate(Vector3.Z, -getFinalTransform().getAngle())
+				.add(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0);
+
 				float newWidth = getLimits().getWidth() + (oldPos.x - newPos.x);
 				float newHeight = getLimits().getHeight() + (newPos.y - oldPos.y);
-				
-				Vector2 oldSize = new Vector2(getLimits().getWidth(), getLimits().getHeight());
-				
-				applySelectionTransform(new Vector2(newWidth, newHeight));
-				
-				for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
-					elo.getTransform().setPosition(elo.projectPosition(
-							elo.getFinalTransform().getPosition().cpy().sub(
-									new Vector2(getLimits().getWidth(), getLimits().getHeight()).sub(oldSize).scl(1/2f)
-									.scl(1, -1)
-									),
-							new Vector2()));
-					elo.calculateLimits();
+							
+				if(newWidth < 0) {
+					newWidth = 1;
+				return;
+				} if(newHeight < 0) {newHeight = 1;return;} {
+
+
+
+					
+					for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
+						elo.getTransform().setPosition(elo.projectPosition(
+								elo.getFinalTransform().getPosition().cpy().add(
+										Helper.xy(unrotatednewPos).sub(
+												new Vector2(-getLimits().getWidth()/2f, getLimits().getHeight()/2f)
+												.rotate(getFinalTransform().getAngle())
+												.add(getFinalTransform().getPosition())
+												)
+										),
+								new Vector2()));
+						elo.calculateLimits();
+					}
+					Editor.getInstance().getUIState().refreshObjectProperties();
 				}
 			}
 		});
@@ -99,12 +117,12 @@ public class EditorLireObject extends LireObject{
 		
 		bottomLeft = new Image(invisible);
 		bottomLeft.setSize(20, 20);
-		bottomLeft.debug();
 		bottomLeft.addListener(new DragListener() {
 			
 			Vector3 newPos = new Vector3();
 			Vector3 oldPos = new Vector3();
-			
+			Vector3 unrotatednewPos = new Vector3();
+
 			public void drag(InputEvent event, float x, float y, int pointer) {
 				setTapSquareSize(0);
 				//ScreenCam
@@ -113,22 +131,35 @@ public class EditorLireObject extends LireObject{
 				
 				//now its in WorldCam
 				stage.getWorldCamera().unproject(newPos);
+								
+				unrotatednewPos.set(newPos);
+				
+				//rotate to align angle
+				newPos
+				.sub(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0)
+				.rotate(Vector3.Z, -getFinalTransform().getAngle())
+				.add(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0);
 				
 				float newWidth = getLimits().getWidth() + (oldPos.x - newPos.x);
 				float newHeight = getLimits().getHeight() + (oldPos.y - newPos.y);
-				
-				Vector2 oldSize = new Vector2(getLimits().getWidth(), getLimits().getHeight());
-				
-				applySelectionTransform(new Vector2(newWidth, newHeight));
-				
-				for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
-					elo.getTransform().setPosition(elo.projectPosition(
-							elo.getFinalTransform().getPosition().cpy().sub(
-									new Vector2(getLimits().getWidth(), getLimits().getHeight()).sub(oldSize).scl(1/2f)
-									.scl(1, 1)
-									),
-							new Vector2()));
-					elo.calculateLimits();
+								
+				if(newWidth < 0) {newWidth = 1; return;} if(newHeight < 0) {newHeight = 1;return;} {
+					applySelectionTransform(new Vector2(newWidth, newHeight));
+					
+					for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
+						elo.getTransform().setPosition(elo.projectPosition(
+								elo.getFinalTransform().getPosition().cpy().add(
+										Helper.xy(unrotatednewPos).sub(
+												new Vector2(-getLimits().getWidth()/2f, -getLimits().getHeight()/2f)
+												.rotate(getFinalTransform().getAngle())
+												.add(getFinalTransform().getPosition())
+												)
+										),
+								new Vector2()));
+						elo.calculateLimits();
+						
+					}
+					Editor.getInstance().getUIState().refreshObjectProperties();
 				}
 			}
 		});
@@ -136,12 +167,12 @@ public class EditorLireObject extends LireObject{
 		
 		topRight = new Image(invisible);
 		topRight.setSize(20, 20);
-		topRight.debug();
 		topRight.addListener(new DragListener() {
 			
 			Vector3 newPos = new Vector3();
 			Vector3 oldPos = new Vector3();
-			
+			Vector3 unrotatednewPos = new Vector3();
+
 			public void drag(InputEvent event, float x, float y, int pointer) {
 				setTapSquareSize(0);
 				//ScreenCam
@@ -151,21 +182,33 @@ public class EditorLireObject extends LireObject{
 				//now its in WorldCam
 				stage.getWorldCamera().unproject(newPos);
 				
+				unrotatednewPos.set(newPos);
+				
+				//rotate to align angle
+				newPos
+				.sub(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0)
+				.rotate(Vector3.Z, -getFinalTransform().getAngle())
+				.add(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0);
+				
 				float newWidth = getLimits().getWidth() + (newPos.x - oldPos.x);
 				float newHeight = getLimits().getHeight() + (newPos.y - oldPos.y);
-				
-				Vector2 oldSize = new Vector2(getLimits().getWidth(), getLimits().getHeight());
-				
-				applySelectionTransform(new Vector2(newWidth, newHeight));
-				
-				for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
-					elo.getTransform().setPosition(elo.projectPosition(
-							elo.getFinalTransform().getPosition().cpy().sub(
-									new Vector2(getLimits().getWidth(), getLimits().getHeight()).sub(oldSize).scl(1/2f)
-									.scl(-1, -1)
-									),
-							new Vector2()));
-					elo.calculateLimits();
+							
+				if(newWidth < 0) {newWidth = 1; return;} if(newHeight < 0) {newHeight = 1;return;} {
+					applySelectionTransform(new Vector2(newWidth, newHeight));
+					
+					for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
+						elo.getTransform().setPosition(elo.projectPosition(
+								elo.getFinalTransform().getPosition().cpy().add(
+										Helper.xy(unrotatednewPos).sub(
+												new Vector2(getLimits().getWidth()/2f, getLimits().getHeight()/2f)
+												.rotate(getFinalTransform().getAngle())
+												.add(getFinalTransform().getPosition())
+												)
+										),
+								new Vector2()));
+						elo.calculateLimits();
+					}
+					Editor.getInstance().getUIState().refreshObjectProperties();
 				}
 			}
 		});
@@ -173,12 +216,12 @@ public class EditorLireObject extends LireObject{
 		
 		bottomRight = new Image(invisible);
 		bottomRight.setSize(20, 20);
-		bottomRight.debug();
 		bottomRight.addListener(new DragListener() {
 			
 			Vector3 newPos = new Vector3();
 			Vector3 oldPos = new Vector3();
-			
+			Vector3 unrotatednewPos = new Vector3();
+
 			public void drag(InputEvent event, float x, float y, int pointer) {
 				setTapSquareSize(0);
 				//ScreenCam
@@ -188,25 +231,55 @@ public class EditorLireObject extends LireObject{
 				//now its in WorldCam
 				stage.getWorldCamera().unproject(newPos);
 				
+				unrotatednewPos.set(newPos);
+				
+				//rotate to align angle
+				newPos
+				.sub(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0)
+				.rotate(Vector3.Z, -getFinalTransform().getAngle())
+				.add(getFinalTransform().getPosition().x, getFinalTransform().getPosition().y, 0);
+				
 				float newWidth = getLimits().getWidth() + (newPos.x - oldPos.x);
 				float newHeight = getLimits().getHeight() + (oldPos.y - newPos.y);
 				
-				Vector2 oldSize = new Vector2(getLimits().getWidth(), getLimits().getHeight());
-				
-				applySelectionTransform(new Vector2(newWidth, newHeight));
-				
-				for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
-					elo.getTransform().setPosition(elo.projectPosition(
-							elo.getFinalTransform().getPosition().cpy().sub(
-									new Vector2(getLimits().getWidth(), getLimits().getHeight()).sub(oldSize).scl(1/2f)
-									.scl(-1, 1)
-									),
-							new Vector2()));
-					elo.calculateLimits();
+				if(newWidth < 0) {newWidth = 1; return;} if(newHeight < 0) {newHeight = 1;return;} {
+					applySelectionTransform(new Vector2(newWidth, newHeight));
+					
+					for(EditorLireObject elo : Editor.getInstance().getSelectedObjects()) {
+						elo.getTransform().setPosition(elo.projectPosition(
+								elo.getFinalTransform().getPosition().cpy().add(
+										Helper.xy(unrotatednewPos).sub(
+												new Vector2(getLimits().getWidth()/2f, -getLimits().getHeight()/2f)
+												.rotate(getFinalTransform().getAngle())
+												.add(getFinalTransform().getPosition())
+												)
+										),
+								new Vector2()));
+						elo.calculateLimits();
+					}
+					Editor.getInstance().getUIState().refreshObjectProperties();
 				}
+
 			}
 		});
 		stage.addActor(bottomRight);
+	}
+	
+	public void dispose() {
+		super.dispose();
+		
+		topLeft.remove();
+		bottomLeft.remove();
+		topRight.remove();
+		bottomRight.remove();
+	}
+	
+	public void setSelectionVisible(boolean visible) {
+		topLeft.setVisible(visible);
+		bottomLeft.setVisible(visible);
+		topRight.setVisible(visible);
+		bottomRight.setVisible(visible);
+
 	}
 	
 	//need to transform newsize from UICam to WorldCam
@@ -218,9 +291,10 @@ public class EditorLireObject extends LireObject{
 
 			elo.getTransform().setScale(elo.projectScale(
 					elo.getFinalTransform().getScale().cpy().scl(
-							newSize.x / oldSize.x,
-							newSize.y / oldSize.y
-							),
+								new Vector2(
+									newSize.x / oldSize.x,
+									newSize.y / oldSize.y)
+								),
 					new Vector2()));
 			elo.calculateLimits();
 						
@@ -323,11 +397,58 @@ public class EditorLireObject extends LireObject{
 				getFinalTransform().getAngle());
 		batch.end();
 		
+		
+		Vector3 center = min.cpy().add(max).scl(1/2f);
+		Vector3 size = max.cpy().sub(min);
 
-		topLeft.setPosition(min.x - topLeft.getWidth()/2f + 3, max.y - topLeft.getHeight()/2f - 3);
-		topRight.setPosition(max.x - topRight.getWidth()/2f - 3, max.y - topRight.getHeight()/2f - 3);
-		bottomLeft.setPosition(min.x - bottomLeft.getWidth()/2f + 3, min.y - bottomLeft.getHeight()/2f + 3);
-		bottomRight.setPosition(max.x - bottomRight.getWidth()/2f - 3, min.y - bottomRight.getHeight()/2f + 3);
+		Vector2 rot = new Vector2();
+		
+		rot.set(
+				-size.x/2f + 3,
+				-size.y/2f + 3)
+			.rotate(getFinalTransform().getAngle())
+			.add(
+				- bottomLeft.getWidth()/2f,
+				- bottomLeft.getHeight()/2f
+				);
+		updateScaleActor(bottomLeft, center, rot);
+
+		rot.set(
+				size.x/2f - 3,
+				-size.y/2f + 3)
+			.rotate(getFinalTransform().getAngle())
+			.add(
+				- bottomRight.getWidth()/2f,
+				- bottomRight.getHeight()/2f
+				);
+		updateScaleActor(bottomRight, center, rot);
+		
+		rot.set(
+				size.x/2f - 3,
+				size.y/2f - 3)
+			.rotate(getFinalTransform().getAngle())
+			.add(
+				- topRight.getWidth()/2f,
+				- topRight.getHeight()/2f
+				);
+		updateScaleActor(topRight, center, rot);
+		
+		rot.set(
+				-size.x/2f + 3,
+				size.y/2f - 3)
+			.rotate(getFinalTransform().getAngle())
+			.add(
+				- topLeft.getWidth()/2f,
+				- topLeft.getHeight()/2f
+				);
+		updateScaleActor(topLeft, center, rot);
+
+	}
+	
+	private void updateScaleActor(Image actor, Vector3 center, Vector2 rot) {
+		actor.setOrigin(actor.getWidth()/2f, actor.getHeight()/2f);
+		actor.setRotation(getFinalTransform().getAngle());
+		actor.setPosition(center.x + rot.x, center.y + rot.y);
 	}
 	
 	@Override

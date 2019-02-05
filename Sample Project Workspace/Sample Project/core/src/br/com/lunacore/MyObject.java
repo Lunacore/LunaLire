@@ -13,7 +13,7 @@ import br.com.lunacore.lunalire.components.CameraComponent;
 
 public class MyObject extends LireObject{
 	
-	public String atelamenumano;
+	public String thisIsAPublicString;
 
 	int hor = 0;
 	int ver = 0;
@@ -28,6 +28,7 @@ public class MyObject extends LireObject{
 		getTransform().getPosition().add(new Vector2(hor, ver).nor().scl(10));
 		//getScene().setCameraActor(getScene().getObjectsByComponent(CameraComponent.class).get(0));
 		getScene().getCameraActor().getTransform().setPosition(getTransform().getPosition());
+		System.out.println("actando");
 	}
 	
 	@Override

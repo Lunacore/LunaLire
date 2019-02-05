@@ -1,5 +1,7 @@
 package br.com.lunacore.lunalire.components;
 
+import java.io.ObjectInputStream.GetField;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -23,6 +25,8 @@ public class CameraComponent extends LireComponent{
 
 	OrthographicCamera camera;
 	Rectangle limits;
+	float viewportWidth;
+	float viewportHeight;
 	
 	public CameraComponent() {
 		limits = new Rectangle();
@@ -32,6 +36,9 @@ public class CameraComponent extends LireComponent{
 	public void read(Element comp, FileHandle relativePath) {
 		
 		Element viewport = comp.getChildByName("viewport");
+		
+		viewportWidth = viewport.getFloat("width");
+		viewportHeight = viewport.getFloat("height");
 		
 		camera.setToOrtho(false,
 				viewport.getFloat("width") * parent.getTransform().getScale().x,
@@ -74,7 +81,12 @@ public class CameraComponent extends LireComponent{
 				parent.getTransform().getPosition().y,
 				0
 				);
+
+		camera.viewportWidth = viewportWidth * parent.getFinalTransform().getScale().x;
+		camera.viewportHeight = viewportHeight * parent.getFinalTransform().getScale().y;
+		camera.update();
 	}
+	
 
 	public VisTable getUITable(DragAndDrop dragndrop) {
 		VisTable table = new VisTable();
@@ -85,23 +97,22 @@ public class CameraComponent extends LireComponent{
 		widthTxt.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
 			public void changed(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent event, Actor actor) {
 				if(widthTxt.isInputValid()) {
-					camera.viewportWidth = Float.parseFloat(widthTxt.getText());
-					camera.update();
+					viewportWidth = Float.parseFloat(widthTxt.getText());
+					
 				}
 				
 			}
 		});
-		widthTxt.setText(camera.viewportWidth + "");
+		widthTxt.setText(viewportWidth + "");
 		table.add(widthTxt).row();
 		
 		table.add(new VisLabel("Viewport height")).pad(5);
 		VisValidatableTextField heightTxt = new VisValidatableTextField(InputValidatorConstants.floatValidator);
-		heightTxt.setText(camera.viewportHeight + "");
+		heightTxt.setText(viewportHeight + "");
 		heightTxt.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
 			public void changed(com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent event, Actor actor) {
 				if(heightTxt.isInputValid()) {
-					camera.viewportHeight = Float.parseFloat(heightTxt.getText());
-					camera.update();
+					viewportHeight = Float.parseFloat(heightTxt.getText());
 				}
 				
 			}

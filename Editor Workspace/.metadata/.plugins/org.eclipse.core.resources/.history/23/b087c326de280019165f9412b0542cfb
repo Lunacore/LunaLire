@@ -1,0 +1,12 @@
+package br.com.lunacore.lunalire.utils;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+
+public class NinePatchLoader {
+	
+	public static NinePatch loadNinePatch(FileHandle handle) {
+		
+	}
+
+}

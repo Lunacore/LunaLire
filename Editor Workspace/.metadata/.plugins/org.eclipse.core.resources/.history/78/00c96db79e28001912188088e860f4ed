@@ -1,0 +1,51 @@
+package br.com.lunacore.ui;
+
+import java.util.ArrayList;
+
+import com.kotcrab.vis.ui.widget.VisScrollPane;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextArea;
+
+public class ConsoleWindow extends VisTable{
+	
+	volatile VisTextArea area;
+	VisScrollPane pane;
+	volatile ArrayList<String> queue;
+	
+	public ConsoleWindow() {
+		super();
+		queue = new ArrayList<String>();
+		area = new VisTextArea();
+		area.setDisabled(true);
+		area.getStyle().disabledFontColor.set(0.5f, 0.7f, 1f, 1);
+		
+		add(pane = new VisScrollPane(area)).grow().pad(10);
+	}
+	
+	public VisTextArea getArea() {
+		return area;
+	}
+	
+	public synchronized void act(float delta) {
+		super.act(delta);
+
+		synchronized (queue) {
+			if(queue.size() > 0) {
+				for(String s : queue) {
+					area.appendText(s + "\n");
+				}
+				queue.clear();
+				
+				area.setPrefRows(area.getText().split("\n").length); 
+				area.setCursorAtTextEnd();
+				pane.setScrollPercentY(100);
+				pane.layout();
+			}
+		}
+		
+	}
+	
+	public synchronized void addText(String text) {
+		queue.add(text);
+	}
+}

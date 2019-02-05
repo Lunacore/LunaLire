@@ -11,9 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -26,21 +28,28 @@ import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
 import br.com.lunacore.helper.Helper;
 import br.com.lunacore.lunalire.LireComponent;
 import br.com.lunacore.lunalire.LireObject;
+import br.com.lunacore.lunalire.utils.NinePatchLoader;
 
 public class SpriteComponent extends LireComponent{
 
-	Texture sprite;
+	Drawable sprite;
 	FileHandle spriteHandle;
 	boolean flipX;
 	boolean flipY;
 	Color tint;
 
-	public Texture getSprite() {
+	public Drawable getSprite() {
 		return sprite;
 	}
 
 	public void setSprite(FileHandle handle) {
-		this.sprite = new Texture(handle);
+		if(handle.name().contains(".9.")) {
+			this.sprite = new NinePatchDrawable(NinePatchLoader.loadNinePatch(handle));
+			System.out.println("Size: (" + getSpriteWidth() + ", " + getSpriteHeight() + ")");
+		}
+		else {
+			this.sprite = new TextureRegionDrawable(new Texture(handle));
+		}
 		this.spriteHandle = handle;
 		
 		if(tint == null) {
@@ -65,10 +74,10 @@ public class SpriteComponent extends LireComponent{
 	public Rectangle getLimits() {
 		if(sprite != null) {
 		return new Rectangle(
-				parent.getFinalTransform().getPosition().x - (sprite.getWidth() * parent.getFinalTransform().getScale().x)/2f,
-				parent.getFinalTransform().getPosition().y - (sprite.getHeight() * parent.getFinalTransform().getScale().y)/2f,
-				sprite.getWidth() * parent.getFinalTransform().getScale().x,
-				sprite.getHeight() * parent.getFinalTransform().getScale().y);
+				parent.getFinalTransform().getPosition().x - (getSpriteWidth() * parent.getFinalTransform().getScale().x)/2f,
+				parent.getFinalTransform().getPosition().y - (getSpriteHeight() * parent.getFinalTransform().getScale().y)/2f,
+				getSpriteWidth() * parent.getFinalTransform().getScale().x,
+				getSpriteHeight() * parent.getFinalTransform().getScale().y);
 		}
 		else {
 			return new Rectangle(
@@ -78,13 +87,66 @@ public class SpriteComponent extends LireComponent{
 					50 * parent.getFinalTransform().getScale().y);
 		}
 	}
+	
+	public float getSpriteWidth() {
+		if(sprite instanceof NinePatchDrawable) {
+			NinePatchDrawable cast = (NinePatchDrawable) sprite;
+			return cast.getPatch().getTotalWidth();
+		}
+		else if(sprite instanceof TextureRegionDrawable) {
+			TextureRegionDrawable cast = (TextureRegionDrawable) sprite;
+			return cast.getRegion().getRegionWidth();
+		}
+		return 0;
+	}
+	
+	public float getSpriteHeight() {
+		if(sprite instanceof NinePatchDrawable) {
+			NinePatchDrawable cast = (NinePatchDrawable) sprite;
+			return cast.getPatch().getTotalHeight();
+		}
+		else if(sprite instanceof TextureRegionDrawable) {
+			TextureRegionDrawable cast = (TextureRegionDrawable) sprite;
+			return cast.getRegion().getRegionHeight();
+		}
+		return 0;
+	}
 
 	@Override
 	public void draw(Batch sb, float parentAlpha) {
 	
 		if(sprite != null) {
 			sb.setColor(tint.cpy().mul(1, 1, 1, parentAlpha));
-			Helper.renderTex(sb, sprite, parent.getFinalTransform(), flipX, flipY);
+
+			if(sprite instanceof NinePatchDrawable) {
+				NinePatchDrawable cast = (NinePatchDrawable) sprite;
+				cast.draw(sb,
+						parent.getFinalTransform().getPosition().x - cast.getPatch().getTotalWidth()/2f * parent.getFinalTransform().getScale().x,
+						parent.getFinalTransform().getPosition().y - cast.getPatch().getTotalHeight()/2f * parent.getFinalTransform().getScale().y,
+						cast.getPatch().getTotalWidth()/2f * parent.getFinalTransform().getScale().x,
+						cast.getPatch().getTotalHeight()/2f * parent.getFinalTransform().getScale().y,
+						cast.getPatch().getTotalWidth() * parent.getFinalTransform().getScale().x,
+						cast.getPatch().getTotalHeight() * parent.getFinalTransform().getScale().y,
+						1,
+						1,
+						parent.getFinalTransform().getAngle()
+						);
+			}
+			else if(sprite instanceof TextureRegionDrawable) {
+				TextureRegionDrawable cast = (TextureRegionDrawable) sprite;
+				cast.draw(sb,
+						parent.getFinalTransform().getPosition().x - cast.getRegion().getRegionWidth()/2f * parent.getFinalTransform().getScale().x,
+						parent.getFinalTransform().getPosition().y - cast.getRegion().getRegionHeight()/2f * parent.getFinalTransform().getScale().y,
+						cast.getRegion().getRegionWidth()/2f * parent.getFinalTransform().getScale().x,
+						cast.getRegion().getRegionHeight()/2f * parent.getFinalTransform().getScale().y,
+						cast.getRegion().getRegionWidth() * parent.getFinalTransform().getScale().x,
+						cast.getRegion().getRegionHeight() * parent.getFinalTransform().getScale().y,
+						1,
+						1,
+						parent.getFinalTransform().getAngle()
+						);
+
+			}
 		}
 		
 		sb.setColor(1, 1, 1, 1);

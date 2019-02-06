@@ -1,14 +1,13 @@
 package br.com.lunacore.lunalire.components;
 
-import java.io.ObjectInputStream.GetField;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Align;
@@ -27,10 +26,12 @@ public class CameraComponent extends LireComponent{
 	Rectangle limits;
 	float viewportWidth;
 	float viewportHeight;
+	ShapeRenderer sr;
 	
 	public CameraComponent() {
 		limits = new Rectangle();
 		camera = new OrthographicCamera();
+		sr = new ShapeRenderer();
 	}
 	
 	public void read(Element comp, FileHandle relativePath) {
@@ -50,6 +51,8 @@ public class CameraComponent extends LireComponent{
 				);
 		camera.zoom = viewport.getFloat("zoom");
 		
+		camera.up.rotate(Vector3.Z, parent.getFinalTransform().getAngle());
+		
 		if(parent.getScene() != null) {
 			parent.getScene().setCamera(camera);
 		}
@@ -62,6 +65,103 @@ public class CameraComponent extends LireComponent{
 	public void draw(Batch sb, float parentAlpha) {
 		
 	}
+	
+	@Override
+	public void drawToEditor(Batch sb, float parentAlpha) {
+		sb.end();
+		sr.setProjectionMatrix(sb.getProjectionMatrix());
+		sr.begin(ShapeType.Line);
+		
+		sr.setColor(Color.WHITE);
+		
+		sr.rect(
+				parent.getFinalTransform().getPosition().x - camera.viewportWidth/2f,
+				parent.getFinalTransform().getPosition().y - camera.viewportHeight/2f,
+				camera.viewportWidth/2f,
+				camera.viewportHeight/2f,
+				camera.viewportWidth,
+				camera.viewportHeight,
+				1,
+				1,
+				parent.getFinalTransform().getAngle()
+				);
+		
+		sr.setColor(Color.RED);
+		
+		//Bottom left
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(10, 10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(50, 10)));
+		
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(10, 10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(10, 50)));
+		
+		//Top left
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(10, -10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(50, -10)));
+		
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(10, -10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(10, -50)));
+		
+		//Bottom right
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-10, 10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-50, 10)));
+				
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-10, 10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-10, 50)));
+		
+		//Top right
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-10, -10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-50, -10)));
+				
+		sr.line(
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-10, -10)),
+				parent.getFinalTransform().getPosition().cpy()
+				.sub(-camera.viewportWidth/2f, -camera.viewportHeight/2f)
+				.add(parent.getFinalTransform().getScale().cpy().scl(-10, -50)));
+		
+		sr.x(parent.getFinalTransform().getPosition(), parent.getFinalTransform().getScale().cpy().scl(30, 30).x);
+		
+		sr.end();
+		sb.begin();
+	}
+
 
 	public OrthographicCamera getCamera() {
 		return camera;
@@ -84,6 +184,9 @@ public class CameraComponent extends LireComponent{
 
 		camera.viewportWidth = viewportWidth * parent.getFinalTransform().getScale().x;
 		camera.viewportHeight = viewportHeight * parent.getFinalTransform().getScale().y;
+		
+		camera.up.set(Vector3.Y.cpy().rotate(Vector3.Z, parent.getFinalTransform().getAngle()));
+		
 		camera.update();
 	}
 	
@@ -164,5 +267,6 @@ public class CameraComponent extends LireComponent{
 				);
 		return limits;
 	}
+
 
 }

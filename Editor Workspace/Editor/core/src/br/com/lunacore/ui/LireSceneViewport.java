@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -30,13 +31,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.kotcrab.vis.ui.widget.VisTable;
 
 import br.com.lunacore.Editor;
 import br.com.lunacore.custom.EditorLireObject;
+import br.com.lunacore.custom.EditorRuler;
 import br.com.lunacore.custom.EditorWindow;
 import br.com.lunacore.custom.ObjectPresets;
+import br.com.lunacore.custom.window.LireObjectPropertiesUI;
+import br.com.lunacore.custom.window.ObjectHierarchy;
 import br.com.lunacore.helper.Helper;
 
 public class LireSceneViewport extends Stage{
@@ -45,9 +51,7 @@ public class LireSceneViewport extends Stage{
 	//UICam: The Scene2D Camera position, fixed, 0 beign bottom left
 	//WorldCam: the editor world camera, can be moved and zoomed by interaction, is centered ad (0, 0)
 	
-	//Here the scenario is just an object that will remain at (0, 0)
-	//And at fullscreen so i can drop things into the scene
-	private EditorLireObject cenario;
+
 	ShapeRenderer sr;
 	
 	boolean selecting = false;
@@ -62,20 +66,26 @@ public class LireSceneViewport extends Stage{
 		
 	Texture translateIcon;
 	Texture rotateIcon;
-	Texture scaleIcon;
 
 	ShaderProgram selectionShader;
 	FrameBuffer selectionBuffer;
 	
 	OrthographicCamera worldCamera;
 	
+	VisTable root;
+	
 	float lastX = -1;
 	float lastY = -1;
 	
+	TopBar topBar;
+	
+	//Here the scenario is just an object that will remain at (0, 0)
+	//And at fullscreen so i can drop things into the scene
+	Actor draggableTable;
+	
 	enum ManipulationMode{
 		TRANSLATE,
-		ROTATE,
-		SCALE
+		ROTATE
 	}
 	
 	ManipulationMode manipulationMode = ManipulationMode.TRANSLATE;
@@ -90,7 +100,6 @@ public class LireSceneViewport extends Stage{
 		
 		translateIcon = new Texture("icons/translate.png");
 		rotateIcon = new Texture("icons/rotate.png");
-		scaleIcon = new Texture("icons/scale.png");
 		
 		selectionBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		
@@ -104,11 +113,37 @@ public class LireSceneViewport extends Stage{
 		sr = new ShapeRenderer();
 		objectsInScene = new ArrayList<EditorLireObject>();
 		localSelection = new ArrayList<EditorLireObject>();
-		//cenario
-		cenario = new EditorLireObject(null, null, null, this);
+
+		root = new VisTable();
+		addActor(root);
+		root.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
-		cenario.getTransform().setPosition(0, 0);
-		cenario.addListener(new ClickListener() {
+		root.add((topBar = new TopBar(Editor.getInstance().getUIState())).getTable()).fillX().expandX().row();
+
+		draggableTable = new Actor();
+		
+		VisTable tbl = new VisTable();
+		tbl.setPosition(0, 0);
+		tbl.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() - topBar.getTable().getHeight());
+		tbl.align(Align.topLeft);
+		//tbl.debugAll();
+		
+		tbl.add();
+		tbl.add(new EditorRuler(false)).growX().height(20).row();
+		tbl.add(new EditorRuler(true)).growY().width(20);
+		
+		tbl.add(draggableTable).grow();
+		
+		addTargetToDraggableTable();
+		
+		root.add(tbl).grow();
+		addDraggableTableListeners();
+
+	}
+	
+	public void addDraggableTableListeners() {
+
+		draggableTable.addListener(new ClickListener() {
 			public void clicked(InputEvent event, float x, float y) {
 				if(!Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)) {
 					Editor.getInstance().unselectAll();
@@ -116,7 +151,7 @@ public class LireSceneViewport extends Stage{
 				super.clicked(event, x, y);
 			}
 		});
-		cenario.addListener(new DragListener() {
+		draggableTable.addListener(new DragListener() {
 			@Override
 			public void dragStart(InputEvent event, float x, float y, int pointer) {
 				selecting = true;
@@ -169,24 +204,44 @@ public class LireSceneViewport extends Stage{
 				super.dragStop(event, x, y, pointer);
 			}
 		});
-
-		addTargetToCenario();
-		addActor(cenario);
-
 	}
 	
 	public void refresh(Viewport viewport) {
 		clear();
 		viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+		
+		root = new VisTable();
+		root.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		root.align(Align.top);
+		root.add((topBar = new TopBar(Editor.getInstance().getUIState())).getTable()).fillX().expandX().row();
+	
+		VisTable tbl = new VisTable();
+		tbl.setPosition(0, 0);
+		tbl.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() - topBar.getTable().getHeight());
+		tbl.align(Align.topLeft);
+		//tbl.debugAll();
+		
+		tbl.add();
+		tbl.add(new EditorRuler(false)).growX().height(20).row();
+		tbl.add(new EditorRuler(true)).growY().width(20);
+		
+		draggableTable.clearListeners();
+		addDraggableTableListeners();
+		tbl.add(draggableTable).grow();
+		
+		root.add(tbl).grow();
+
+		addActor(root);
 
 		selectionBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 
 		setViewport(viewport);
-		addActor(cenario);
-		for(EditorLireObject obj :getObjectsInScene()) {
+		for(EditorLireObject obj : getObjectsInScene()) {
 			addActor(obj);
+			addLireObjectListener(obj);
+			obj.toFront();
 		}
-		cenario.toBack();
+		draggableTable.toBack();
 	}
 	
 	public void resetScene() {
@@ -194,15 +249,12 @@ public class LireSceneViewport extends Stage{
 			removeLireObject(objectsInScene.get(i));
 		}
 		objectsInScene.clear();
-		cenario.getTransform().setPosition(0, 0);
-		cenario.getTransform().setScale(1, 1);
 	}
 	
 	//TODO: Update methods
 	public void act(float delta) {
 		super.act(delta);
 		//Cenario needs to be clicked, handled by UICam, that why it needs UICam positioning
-		cenario.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		worldCamera.update();
 		
 		
@@ -292,7 +344,7 @@ public class LireSceneViewport extends Stage{
 		getBatch().begin();
 		for(EditorLireObject lo : objectsInScene) {
 			lo.setShowing(true);
-			lo.draw(getBatch(), 1);
+			lo.drawToEditor(getBatch(), 1);
 			lo.setShowing(false); //This is for the Scene2D Stage to don't draw the objects again (with HIS projection)
 		}
 		getBatch().end();
@@ -339,9 +391,6 @@ public class LireSceneViewport extends Stage{
 			if(manipulationMode == ManipulationMode.ROTATE) {
 				icon = rotateIcon;
 			}
-			if(manipulationMode == ManipulationMode.SCALE) {
-				icon = scaleIcon;
-			}
 			
 			//Here i need to transform the Object WorldPos to UIPos
 			
@@ -375,47 +424,44 @@ public class LireSceneViewport extends Stage{
 	}
 	
 	public ArrayList<EditorLireObject> getObjectsInScene(){
-		objectsInScene.remove(cenario);
 		return objectsInScene;
 	}
 	
-	//TODO: Add Lire object
-	public void addLireObject(final EditorLireObject lr) {
+	public void addLireObjectListener(final EditorLireObject lr) {
 		lr.addListener(new ClickListener(){
-			
-			boolean dragged = false;
-			
-			public void clicked(InputEvent event, float x, float y) {
-				if(!dragged) {
-						if(Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)) {
-							if(Editor.getInstance().getSelectedObjects().contains(lr)) {
-								Editor.getInstance().unselect(lr);
-							}
-							else {
-								Editor.getInstance().addSelectedObject(lr);
-							}
+					
+					boolean dragged = false;
+					
+					public void clicked(InputEvent event, float x, float y) {
+						if(!dragged) {
+								if(Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)) {
+									if(Editor.getInstance().getSelectedObjects().contains(lr)) {
+										Editor.getInstance().unselect(lr);
+									}
+									else {
+										Editor.getInstance().addSelectedObject(lr);
+									}
+								}
+								else {
+									Editor.getInstance().setSelectedObject(lr);
+								}
 						}
-						else {
+						dragged = false;
+					}
+					
+					public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+						if(!Editor.getInstance().getSelectedObjects().contains(lr) &&
+								!Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) && button == Buttons.LEFT) {
 							Editor.getInstance().setSelectedObject(lr);
 						}
-				}
-				dragged = false;
-			}
-			
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				if(!Editor.getInstance().getSelectedObjects().contains(lr) &&
-						!Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) && button == Buttons.LEFT) {
-					Editor.getInstance().setSelectedObject(lr);
-				}
-				return super.touchDown(event, x, y, pointer, button);
-			}
-			
-			public void touchDragged(InputEvent event, float x, float y, int pointer) {
-				dragged = true;
-				super.touchDragged(event, x, y, pointer);
-			}
-		});
-		
+						return super.touchDown(event, x, y, pointer, button);
+					}
+					
+					public void touchDragged(InputEvent event, float x, float y, int pointer) {
+						dragged = true;
+						super.touchDragged(event, x, y, pointer);
+					}
+				});
 		DragListener dl = new DragListener() {
 			
 			float lastX = -1;
@@ -429,7 +475,7 @@ public class LireSceneViewport extends Stage{
 						);
 				super.dragStart(event, x, y, pointer);
 			}
-
+		
 			public void drag(InputEvent event, float x, float y, int pointer) {
 				if(Gdx.input.isButtonPressed(Buttons.LEFT) && Editor.getInstance().getSelectedObjects().contains(lr)) {
 					if(lastX != -1 && lastY != -1) {
@@ -464,39 +510,12 @@ public class LireSceneViewport extends Stage{
 								l.getTransform().setAngle(l.getTransform().getAngle() + (ang1 - ang2));
 							}
 							break;
-						case SCALE:
-							for(EditorLireObject l : Editor.getInstance().getSelectedObjects()) {
-								
-								//Not working the way i want
-								
-//								//Vector2 rotated = new Vector2(dx, dy).scl(1/200f); //Modo absoluto
-//								Vector2 rotated = new Vector2(dx, dy).rotate(-l.getFinalTransform().getAngle()).scl(1/200f);
-//								//startDragPoint is also in ScreenCam
-//								//We are using case, so previews declared variables also exists here
-//								worldMousePos = worldCamera.unproject(new Vector3(startDragPoint, 0));
-//								
-//								Vector2 at = Helper.xy(worldMousePos).cpy().sub(lr.getFinalTransform().getPosition());
-//								if(at.x < 0) {
-//									rotated.x = -rotated.x;
-//								}
-//								if(at.y > 0) {
-//									rotated.y = -rotated.y;
-//								}
-//								
-//								if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
-//									rotated.x = Math.max(rotated.x, rotated.y);
-//									rotated.y = rotated.x;
-//								}
-//								
-//								l.getTransform().getScale().add(rotated);
-							}
-							break;
 						}
 						
 						
 						Editor.getInstance().getUIState().getSceneManager().unsave();
-						Editor.getInstance().refreshObjectProperties();
-
+						Editor.getInstance().getUIState().refreshWindow(LireObjectPropertiesUI.class);
+		
 					}
 					//ScreenCam
 					lastX = Gdx.input.getX(pointer);
@@ -511,7 +530,6 @@ public class LireSceneViewport extends Stage{
 				}
 			}
 		};
-		
 		Editor.getInstance().getDragAndDrop().addTarget(new Target(lr) {
 			public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
 				if(payload.getObject() instanceof FileHandle) {
@@ -520,7 +538,7 @@ public class LireSceneViewport extends Stage{
 				}
 				return false;
 			}
-
+		
 			public void drop(Source source, Payload payload, float x, float y, int pointer) {
 				FileHandle fh = (FileHandle) payload.getObject();
 				
@@ -528,7 +546,7 @@ public class LireSceneViewport extends Stage{
 					if(fh.name().endsWith(".lo")) {
 						addLireObject(Editor.getInstance().getStage().loadObject(fh, Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()));
 						Editor.getInstance().getUIState().getSceneManager().unsave();
-
+						Editor.getInstance().getUIState().refreshWindow(ObjectHierarchy.class);
 					}
 				}
 			}
@@ -536,13 +554,14 @@ public class LireSceneViewport extends Stage{
 		
 		dl.setTapSquareSize(0);
 		lr.addListener(dl);
+	}
+	
+	//TODO: Add Lire object
+	public void addLireObject(final EditorLireObject lr) {
+		addLireObjectListener(lr);
 		Editor.getInstance().setSelectedObject(lr);
 		addActor(lr);
 		objectsInScene.add(lr);
-		lr.toBack();
-		cenario.toBack();
-		//I actually dont need this
-		//cenario.attachChildren(lr);
 	}
 	
 	public void removeLireObject(EditorLireObject obj) {
@@ -552,7 +571,7 @@ public class LireSceneViewport extends Stage{
 		obj.remove();
 		obj.dispose();
 		Editor.getInstance().unselect(obj);
-		Editor.getInstance().getUIState().refreshObjectHierarchy();
+		Editor.getInstance().getUIState().refreshWindow(ObjectHierarchy.class);
 		Editor.getInstance().getUIState().getSceneManager().unsave();
 	}
 	
@@ -565,8 +584,8 @@ public class LireSceneViewport extends Stage{
 	}
 	
 	//TODO: Specific sittuation functions (mostly used just once in the code, but to big to be put where it should be)
-	public void addTargetToCenario() {
-		Editor.getInstance().getDragAndDrop().addTarget(new Target(cenario) {
+	public void addTargetToDraggableTable() {
+		Editor.getInstance().getDragAndDrop().addTarget(new Target(draggableTable) {
 			public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
 				if(payload.getObject() instanceof FileHandle) {
 					FileHandle fh = (FileHandle) payload.getObject();
@@ -582,12 +601,12 @@ public class LireSceneViewport extends Stage{
 					if(fh.name().endsWith(".lo")) {
 						addLireObject(Editor.getInstance().getStage().loadObject(fh, Gdx.input.getX(), Gdx.input.getY()));
 						Editor.getInstance().getUIState().getSceneManager().unsave();
-						Editor.getInstance().getUIState().refreshObjectHierarchy();
+						Editor.getInstance().getUIState().refreshWindow(ObjectHierarchy.class);
 					}
 					else if(fh.name().endsWith(".png") || fh.name().endsWith(".jpg")) {
 						addLireObject(ObjectPresets.getSpritePreset(fh));
 						Editor.getInstance().getUIState().getSceneManager().unsave();
-						Editor.getInstance().getUIState().refreshObjectHierarchy();
+						Editor.getInstance().getUIState().refreshWindow(ObjectHierarchy.class);
 					}
 				}
 			}
@@ -595,21 +614,23 @@ public class LireSceneViewport extends Stage{
 		});
 	}
 	
-	public void refreshObjectParams() {
+	public void refreshObjectParams(Class oldClass, Class newClass) {
 		for(EditorLireObject obj : getObjectsInScene()) {
-			if(obj.getChildClass() != null) {
+			if(obj.getChildClass() == null) continue;
+			if(obj.getChildClass().getCanonicalName().equals(oldClass.getCanonicalName())) {
+				obj.setChildClass(newClass);
 				
 				for(String s : obj.getParams().keySet()) {
 					try {
-						obj.getChildClass().getField(s);
+						newClass.getField(s);
 					}catch(NoSuchFieldException e) {
-						obj.setParam(s, null);
+						obj.removeParam(s);
 						//Learn portuguese
 						System.out.println("Achei um campo que não existe mais na classe: " + s);
 					}
 				}
 				
-				for(Field f : obj.getChildClass().getFields()) {
+				for(Field f : newClass.getFields()) {
 					if(obj.getParam(f.getName()) == null) {
 						obj.setParam(f.getName(), "");
 						//Brazilian, not Portugal
@@ -618,11 +639,6 @@ public class LireSceneViewport extends Stage{
 				}
 			}
 		}
-	}
-	
-	//TODO: Getters / Setters
-	public EditorLireObject getCenario() {
-		return cenario;
 	}
 	
 	//TODO: Input Handling
@@ -649,11 +665,6 @@ public class LireSceneViewport extends Stage{
 		if(keyCode == Keys.E) {
 			if(getKeyboardFocus() instanceof EditorWindow) {
 				manipulationMode = ManipulationMode.ROTATE;
-			}
-		}
-		if(keyCode == Keys.R) {
-			if(getKeyboardFocus() instanceof EditorWindow) {
-				manipulationMode = ManipulationMode.SCALE;
 			}
 		}
 		return super.keyDown(keyCode);
@@ -703,7 +714,7 @@ public class LireSceneViewport extends Stage{
 		return super.scrolled(amount);
 	}
 
-	public Camera getWorldCamera() {
+	public OrthographicCamera getWorldCamera() {
 		return worldCamera;
 	}
 

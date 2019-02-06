@@ -14,6 +14,7 @@ public class OtherObject extends LireObject{
 	Vector2 org;
 	float timer = 0;
 	
+	
 	public OtherObject(Element root, FileHandle assetsFolder, LireScene scene) {
 		super(root, assetsFolder, scene);
 		

@@ -480,6 +480,11 @@ public class ShapeRendererComponent extends LireComponent{
 		sb.begin();
 	}
 	
+	public void drawToEditor(Batch sb, float parentAlpha) {
+		draw(sb, parentAlpha);
+	}
+
+	
 	public void update(float delta) {
 		
 	}
@@ -731,6 +736,7 @@ public class ShapeRendererComponent extends LireComponent{
 	public String getValidationCause() {
 		return "Object already has a Shape Renderer component!";
 	}
+
 
 
 	

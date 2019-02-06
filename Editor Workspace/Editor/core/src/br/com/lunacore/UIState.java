@@ -9,76 +9,69 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.kotcrab.vis.ui.util.InputValidator;
 import com.kotcrab.vis.ui.widget.VisDialog;
-import com.kotcrab.vis.ui.widget.VisScrollPane;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooserListener;
 
+import br.com.lunacore.custom.ConsoleErrorStream;
 import br.com.lunacore.custom.ConsoleOutputStream;
 import br.com.lunacore.custom.EditorLireObject;
+import br.com.lunacore.custom.EditorRuler;
 import br.com.lunacore.custom.EditorWindow;
 import br.com.lunacore.custom.StringInputDialog;
 import br.com.lunacore.custom.YesNoDialog.DialogListener;
+import br.com.lunacore.custom.window.ClassListUI;
+import br.com.lunacore.custom.window.ConsoleWindow;
+import br.com.lunacore.custom.window.FileExplorer;
+import br.com.lunacore.custom.window.LireObjectPropertiesUI;
+import br.com.lunacore.custom.window.ObjectHierarchy;
 import br.com.lunacore.states.State;
-import br.com.lunacore.ui.ClassListUI;
-import br.com.lunacore.ui.ConsoleWindow;
-import br.com.lunacore.ui.FileExplorer;
-import br.com.lunacore.ui.LireObjectPropertiesUI;
 import br.com.lunacore.ui.LireSceneViewport;
-import br.com.lunacore.ui.ObjectHierarchy;
 import br.com.lunacore.ui.SceneManager;
 import br.com.lunacore.ui.TopBar;
+import br.com.lunacore.ui.WindowCollection;
 
 public class UIState extends State{
 
 	LireSceneViewport stage;
-	VisTable root;
-	
-	ClassListUI classList;
-	FileExplorer explorer;
-	LireObjectPropertiesUI objectProperties;
 	SceneManager sceneManager;
-	ConsoleWindow console;
-	ObjectHierarchy hierarchy;
 	
-	EditorWindow classWindow;
-	EditorWindow explorerWindow;
-	EditorWindow objPropWindow;
-	EditorWindow consoleWindow;
-	EditorWindow hierarchyWindow;
+	WindowCollection collection;
 
-	
 	public volatile ConsoleOutputStream editorOut;
-	
+	public volatile ConsoleErrorStream editorErr;
+
 	public void create() {
 		super.create();
-		stage = new LireSceneViewport(new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-		//stage.setDebugAll(true);
 		
-		root = new VisTable();
-		stage.addActor(root);
-		root.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		collection = new WindowCollection();
+
+		stage = new LireSceneViewport(new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		Gdx.input.setInputProcessor(stage);
 
+
 		createMainPanel();
-		insertIntoMainPanel();
+
+		stage.refresh(new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		
-		editorOut = new ConsoleOutputStream(System.out);
+		insertIntoMainPanel();
+
+		editorOut = new ConsoleOutputStream();
+		editorErr = new ConsoleErrorStream();
 
 	}
 	
 	public void resize(int width, int height) {
 		//stage = new LireSceneViewport(new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		stage.refresh(new ScalingViewport(Scaling.fit, width, height));
-		root = new VisTable();
-		stage.addActor(root);
-		root.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
 		Gdx.input.setInputProcessor(stage);
 		insertIntoMainPanel();
 	}
@@ -94,7 +87,7 @@ public class UIState extends State{
 			public void selected(Array<FileHandle> files) {
 				Editor.getInstance().setCurrentProject(files.get(0).parent());
 				sceneManager.loadScene();
-				Editor.getInstance().refreshClassList();
+				refreshWindow(ClassListUI.class);
 			}
 
 			public void canceled() {
@@ -119,102 +112,30 @@ public class UIState extends State{
 		}
 	}
 	
-	public void printParallel(String text) {		
-		synchronized(console) {
-			console.addText(text);
+	public void printParallel(String text, boolean error) {		
+		synchronized(getWindow(ConsoleWindow.class)) {
+			getWindow(ConsoleWindow.class).addText(text, error);
 		}
-		
 	}
+
 	
 	public void insertIntoMainPanel() {
-		root.add(new TopBar(this).getTable()).fillX().expandX().row();
-		root.add(new VisTable()).grow();
-		
-		if(classWindow.isOpen()) {
-			classWindow.setPosition(30, Gdx.graphics.getHeight() - classWindow.getHeight() - 50);
-			stage.addActor(classWindow);
-		}
-		if(explorerWindow.isOpen()) {
-			explorerWindow.setPosition(30, 30);
-			stage.addActor(explorerWindow);
-		}
-		if(objPropWindow.isOpen()) {
-			objPropWindow.setPosition(Gdx.graphics.getWidth() - objPropWindow.getWidth() - 30, Gdx.graphics.getHeight() - objPropWindow.getHeight() - 50);
-			stage.addActor(objPropWindow);
-		}
-		if(consoleWindow.isOpen()) {
-			consoleWindow.setPosition(Gdx.graphics.getWidth(), 30);
-			stage.addActor(consoleWindow);
-		}
-		if(hierarchyWindow.isOpen()) {
-			hierarchyWindow.setPosition(Gdx.graphics.getWidth()/2f, 30);
-			stage.addActor(hierarchyWindow);
-		}
+		collection.insertIntoStage();
+
 	}
 	
 	public void createMainPanel() {
-		classList = new ClassListUI(this);
-		sceneManager = new SceneManager(this);
-		objectProperties = new LireObjectPropertiesUI(this);
-		explorer = new FileExplorer(this);
-		console = new ConsoleWindow();
-		hierarchy = new ObjectHierarchy();
-
-		classWindow = new EditorWindow("Class list", true);
-		classWindow.addCloseButton();
-		classWindow.add(classList).grow();
-		classWindow.setPosition(16, 240);
-		classWindow.setSize(250, 450);
-		classWindow.setResizable(true);
-		classWindow.setPosition(10, Gdx.graphics.getHeight());
-		
-		explorerWindow = new EditorWindow("Explorer");
-		explorerWindow.addCloseButton();
-		explorerWindow.setSize(700, 250);
-		explorerWindow.add(explorer).grow();
-		explorerWindow.setResizable(true);
-		
-		objPropWindow = new EditorWindow("Object Properties");
-		objPropWindow.addCloseButton();
-		objPropWindow.setPosition(800, 100);
-		objPropWindow.setSize(300, 450);
-		objPropWindow.add(objectProperties).prefSize(200).grow();
-		objPropWindow.setResizable(true);
-		objPropWindow.pack();
-		
-		consoleWindow = new EditorWindow("Console");
-		consoleWindow.addCloseButton();
-		consoleWindow.setPosition(100, 100);
-		consoleWindow.setSize(700, 250);
-		consoleWindow.add(console).grow();
-		consoleWindow.setResizable(true);
-		
-		hierarchyWindow = new EditorWindow("Object Hierarchy");
-		hierarchyWindow.addCloseButton();
-		hierarchyWindow.centerWindow();
-		hierarchyWindow.setSize(250, 450);
-		hierarchyWindow.add(hierarchy).grow();
-		hierarchyWindow.setResizable(true);
+		sceneManager = new SceneManager();
 	}
 	
 	public void addActor(Actor actor) {
 		stage.addActor(actor);
 	}
 
-	public void refreshClassList() {
-		classList.refresh();
-		explorer.refresh();
+	public void refreshWindow(Class win) {
+		collection.refresh(win);
 	}
 	
-	public void refreshObjectProperties() {
-		objectProperties.refresh();		
-		objPropWindow.pack();
-	}
-	
-	public void refreshObjectHierarchy() {
-		hierarchy.refresh();
-		hierarchyWindow.pack();
-	}
 	
 	public void enter() {
 		
@@ -228,41 +149,19 @@ public class UIState extends State{
 		stage.act(delta);
 	}
 
-	public void openConsoleWindow() {
-		if(!consoleWindow.isOpen()) {
-			stage.addActor(consoleWindow);
-			consoleWindow.open();
-		}
-	}
-	
-	public void openClassListWindow() {
-		if(!classWindow.isOpen()) {
-			stage.addActor(classWindow);
-			classWindow.open();
-		}
-	}
-
-	public void openAssetExplorerWindow() {
-		if(!explorerWindow.isOpen()) {
-			stage.addActor(explorerWindow);
-			explorerWindow.open();
-		}				
+	public void openWindow(Class win) {
+		collection.open(win);
 	}
 
 	public void addDialog(VisDialog dialog) {
 		stage.addActor(dialog);
+		dialog.centerWindow();
 	}
 
 	public LireSceneViewport getStage() {
 		return stage;
 	}
 
-	public void openObjectPropertiesWindow() {
-		if(!objPropWindow.isOpen()) {
-			stage.addActor(objPropWindow);
-			objPropWindow.open();
-		}				
-	}
 
 	public void addObjectToViewport(EditorLireObject lr) {
 		stage.addLireObject(lr);
@@ -293,16 +192,12 @@ public class UIState extends State{
 		return sceneManager;
 	}
 
-	public ClassListUI getClassList() {
-		return classList;
+	public <T> T getWindow(Class<T> win) {
+		return collection.getWindow(win);
 	}
 
-	public ObjectHierarchy getHierarchy() {
-		return hierarchy;
+	public WindowCollection getWindowCollection() {
+		return collection;
 	}
-
-
-
-	
 
 }

@@ -19,6 +19,12 @@ public abstract class LireComponent {
 	public abstract void draw(Batch sb, float parentAlpha);
 	public abstract void dispose();
 	public abstract Rectangle getLimits();
+	/** This draw call is only called at the editor
+	 * 	its used to show visual information about the component in the editor, but not in the game
+	 * 
+	 * @param batch
+	 */
+	public abstract void drawToEditor(Batch sb, float parentAlpha);
 	/**
 	 * This method is called when an LireObject tries to append a new component of this class 
 	 * into it
@@ -58,7 +64,7 @@ public abstract class LireComponent {
 	 * so it can be read by the method {@link #read(Element, FileHandle)}
 	 * 
 	 * @param root the parent of the component, when creating a new element, use
-	 * <code>Element el = new Element("Name", root)</code>
+	 * <code>Element el = new Element("component", root)</code>
 	 * @return the element to be appended to the root
 	 * 
 	 * do NOT append the element to the root by yourself
@@ -79,6 +85,20 @@ public abstract class LireComponent {
 		}
 	}
 
-	
+	public static String getLocalPath(FileHandle handle) {
+		if(handle == null) return "";
+		String[] aps = handle.path().split("/");
+		boolean found = false;
+		String finalString = "";
+		for(String s : aps) {
+			if(found) {
+				finalString += "/" + s;
+			}			
+			if(s.equals("assets")) {
+				found = true;
+			}
+		}		
+		return finalString.substring(1);
+	}
 
 }

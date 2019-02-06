@@ -1,0 +1,5 @@
+package br.com.lunacore.custom;
+
+public class TabbedPane extends VisTabel{
+
+}

@@ -1,7 +1,0 @@
-package br.com.lunacore;
-
-import br.com.lunacore.lunalire.LireObject;
-
-public class MyObject extends LireObject{
-
-}

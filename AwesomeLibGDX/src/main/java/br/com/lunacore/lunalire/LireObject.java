@@ -1,19 +1,14 @@
 package br.com.lunacore.lunalire;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
 import br.com.lunacore.lunalire.KeyMapper.Device;
@@ -69,8 +64,13 @@ public class LireObject extends Actor{
 
 		for(Element el : root.getChildrenByName("component")) {
 			Class lc = Class.forName(el.getAttribute("class"));
-			addComponent(lc);
-			getComponent(lc).read(el, relativePath);
+			Object resp = addComponent(lc);
+			if(resp instanceof LireComponent) {
+				getComponent(lc).read(el, relativePath);
+			}
+			else {
+				System.out.println(resp);
+			}
 		}
 	}
 	
@@ -148,6 +148,13 @@ public class LireObject extends Actor{
 		}
 	}
 	
+	public void drawToEditor(Batch batch, float parentAlpha) {
+		for(LireComponent lc : components) {
+			lc.drawToEditor(batch, parentAlpha);
+		}
+	}
+	
+	
 	public Transform getFinalTransform() {
 		
 		if(getLireParent() != null) {
@@ -199,13 +206,6 @@ public class LireObject extends Actor{
 		return null;
 	}
 	
-//	public void drawDebug(ShapeRenderer shapes) {
-//	}
-//	
-//	public void debugDraw(ShapeRenderer shapes) {
-//		super.drawDebug(shapes);
-//	}
-	
 	public ArrayList<LireObject> getChildren() {
 		return children;
 	}
@@ -247,6 +247,8 @@ public class LireObject extends Actor{
 		for(LireComponent lc : getComponents()) {
 			Element component = lc.getXmlElement(root);
 			root.addChild(component);
+			
+			System.out.println(component);
 		}
 		
 		return root;

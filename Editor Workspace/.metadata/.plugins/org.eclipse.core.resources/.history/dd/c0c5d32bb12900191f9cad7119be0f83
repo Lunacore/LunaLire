@@ -1,0 +1,83 @@
+package br.com.lunacore.ui;
+
+import java.util.HashMap;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisWindow;
+
+import br.com.lunacore.Editor;
+import br.com.lunacore.custom.EditorWindow;
+
+public class WindowCollection {
+	
+	HashMap<VisTable, EditorWindow> windows;
+	HashMap<VisTable, Vector2> positioning;
+	HashMap<Class, VisTable> classing;
+	/*
+	ClassListUI classList;
+	FileExplorer explorer;
+	LireObjectPropertiesUI objectProperties;
+	ConsoleWindow console;
+	ObjectHierarchy hierarchy;
+	
+	EditorWindow classWindow;
+	EditorWindow explorerWindow;
+	EditorWindow objPropWindow;
+	EditorWindow consoleWindow;
+	EditorWindow hierarchyWindow;
+	 */
+	
+	public WindowCollection() {
+		windows = new HashMap<VisTable, EditorWindow>();
+		positioning = new HashMap<VisTable, Vector2>();
+		classing = new HashMap<Class, VisTable>();
+		
+		registerWindow(ClassListUI.class, 10, 240, 250, 450);
+		registerWindow(LireObjectPropertiesUI.class, 800, 100, 300, 450);
+		registerWindow(FileExplorer.class, 10, 10, 700, 250);
+		registerWindow(ConsoleWindow.class, 100, 100, 700, 250);
+		registerWindow(ObjectHierarchy.class, 0, 0, 250, 450);
+	}
+	
+	
+	
+	public void registerWindow(Class win, float x, float y, float width, float height) {
+		try {
+			VisTable tbl = (VisTable) win.newInstance();
+			
+			EditorWindow classWindow = new EditorWindow(tbl.getName(), true);
+			classWindow.addCloseButton();
+			classWindow.add(tbl).grow();
+			classWindow.setPosition(x, y);
+			classWindow.setSize(width, height);
+			classWindow.setResizable(true);
+			classWindow.setPosition(10, Gdx.graphics.getHeight());
+			
+			positioning.put(tbl, new Vector2(x, y));
+			windows.put(tbl, classWindow);
+			classing.put(win, tbl);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void refresh(Class c) {
+		classing.get(c).refresh();
+		windows.get(classing.get(c)).pack();
+	}
+	
+	public void insertIntoStage() {
+		for(VisTable v : windows.keySet()) {
+			if(windows.get(v).isOpen()) {
+				//Posicionamento
+				windows.get(v).setPosition(positioning.get(v).x, positioning.get(v).y);
+				Editor.getInstance().getStage().addActor(windows.get(v));
+			}
+		}
+		
+	}
+
+}

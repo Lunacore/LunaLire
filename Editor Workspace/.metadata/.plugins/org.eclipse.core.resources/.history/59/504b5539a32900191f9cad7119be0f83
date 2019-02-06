@@ -1,0 +1,68 @@
+package br.com.lunacore.custom;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector3;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextField.VisTextFieldStyle;
+
+import br.com.lunacore.Editor;
+
+public class EditorRuler extends VisTable{
+
+	ShapeRenderer sr;
+	BitmapFont font;
+	
+	boolean vertical;
+	
+	float step = 100;
+	
+	public EditorRuler(boolean vertical) {
+		this.vertical = vertical;
+		sr = new ShapeRenderer();
+		font = getSkin().get(VisTextFieldStyle.class).font;
+		
+		if(vertical) {
+			setWidth(30);
+		}
+		else {
+			setHeight(30);
+		}
+		
+		
+	}
+	
+	public void draw(Batch batch, float parentAlpha) {
+		super.draw(batch, parentAlpha);
+		
+		if(vertical) {
+			
+		}
+		else {
+			
+			Vector3 left = new Vector3(getX(), Gdx.graphics.getHeight() - getY(), 0);
+			Editor.getInstance().getStage().getWorldCamera().unproject(left);
+			left.x = (int)(left.x / step) * step;
+			
+			Vector3 right = new Vector3(getX() + getWidth(), Gdx.graphics.getHeight() - getY(), 0);
+			Editor.getInstance().getStage().getWorldCamera().unproject(right);
+			right.x = (int)(right.x / step) * step;
+			
+			batch.end();
+			sr.setProjectionMatrix(batch.getProjectionMatrix());
+			sr.begin(ShapeType.Line);
+			for(float i = left.x; i <= right.x; i += step) {
+				
+				Vector3 leftScreen = Editor.getInstance().getStage().getWorldCamera().project(new Vector3(i, left.y, 0));
+				
+				sr.line(i, getY(), i, getY() + getHeight());
+			}
+			sr.end();
+			batch.begin();
+		}
+	}
+	
+}

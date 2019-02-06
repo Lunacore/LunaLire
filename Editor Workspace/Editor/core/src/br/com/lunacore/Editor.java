@@ -2,10 +2,22 @@ package br.com.lunacore;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -18,7 +30,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.kotcrab.vis.ui.VisUI;
 
 import br.com.lunacore.custom.EditorLireObject;
-import br.com.lunacore.ui.FileExplorer;
+import br.com.lunacore.custom.window.FileExplorer;
+import br.com.lunacore.custom.window.LireObjectPropertiesUI;
 import br.com.lunacore.ui.LireSceneViewport;
 
 public class Editor extends ApplicationAdapter {
@@ -33,10 +46,22 @@ public class Editor extends ApplicationAdapter {
 	
 	DragAndDrop dragndrop;
 	
+	WatchService watchService;
+	Map<WatchKey, FileHandle> keys;
+	
+	Thread watcherThread;
+	
+	HashMap<FileHandle, Class> compiledClasses;
+	
+	Stack<FileHandle> queueToCompile;
+	
 	public void create () {
 		instance = this;
 		selectedObjects = new ArrayList<EditorLireObject>();
 		dragndrop = new DragAndDrop();
+		compiledClasses = new HashMap<FileHandle, Class>();
+		queueToCompile = new Stack<FileHandle>();
+		
 		//VisUI.load(Gdx.files.internal("skin/tinted.json"));
 		VisUI.load();
 		AwesomeLibGDX.init();
@@ -66,15 +91,13 @@ public class Editor extends ApplicationAdapter {
 		}
 		selectedObjects.clear();
 		
-		uiState.refreshObjectProperties();
+		uiState.refreshWindow(LireObjectPropertiesUI.class);
 	}
 	
 	public void setSelectedObject(EditorLireObject object) {
-		if(object != getStage().getCenario()) {
-			selectedObjects.clear();
-			selectedObjects.add(object);
-		}
-		uiState.refreshObjectProperties();
+		selectedObjects.clear();
+		selectedObjects.add(object);
+		uiState.refreshWindow(LireObjectPropertiesUI.class);
 
 	}
 	
@@ -82,17 +105,15 @@ public class Editor extends ApplicationAdapter {
 		if(selectedObjects.contains(object)) {
 			selectedObjects.remove(object);
 		}
-		uiState.refreshObjectProperties();
+		uiState.refreshWindow(LireObjectPropertiesUI.class);
 
 	}
 	
 	public void addSelectedObject(EditorLireObject object) {
-		if(object != getStage().getCenario()) {
-			if(!selectedObjects.contains(object)) {
-				selectedObjects.add(object);
-			}
+		if(!selectedObjects.contains(object)) {
+			selectedObjects.add(object);
 		}
-		uiState.refreshObjectProperties();
+		uiState.refreshWindow(LireObjectPropertiesUI.class);
 
 	}
 	
@@ -101,29 +122,104 @@ public class Editor extends ApplicationAdapter {
 		}
 		selectedObjects.clear();
 		for(EditorLireObject lo : objects) {
-			if(lo != getStage().getCenario()) {
-				selectedObjects.add(lo);
-			}
+			selectedObjects.add(lo);
 		}
-		uiState.refreshObjectProperties();
+		uiState.refreshWindow(LireObjectPropertiesUI.class);
 
 	}
 	
 	public void addSelectedObjects(ArrayList<EditorLireObject> objects) {
 		for(EditorLireObject lo : objects) {
-			if(lo != getStage().getCenario()) {
-				lo.setDebug(true);
-				selectedObjects.add(lo);
-			}
+			lo.setDebug(true);
+			selectedObjects.add(lo);
 		}
-		uiState.refreshObjectProperties();
+		uiState.refreshWindow(LireObjectPropertiesUI.class);
 
 	}
 
 	public void setCurrentProject(FileHandle currentProject) {
 		this.currentProject = currentProject;
+		
+		try {
+			watchService = FileSystems.getDefault().newWatchService();
+			keys = new HashMap<WatchKey, FileHandle>();
+			
+			registerDir(currentProject.child("core/src"));
+			
+			if(watcherThread != null) {
+				watcherThread.interrupt();
+			}
+			
+			watcherThread = new Thread(new Runnable() {
+				public void run() {
+					try {
+						while(true) {
+							WatchKey key = watchService.take();
+								
+							FileHandle f = keys.get(key);
+							
+							if(f != null){
+								for(WatchEvent<?> event : key.pollEvents()) {
+									WatchEvent.Kind kind = event.kind();
+																		
+									if (kind == StandardWatchEventKinds.OVERFLOW) {
+					                    continue;
+					                }
+									
+									Path p = (Path) event.context();
+									FileHandle file = f.child(p.toString());
+									
+									
+									if(file.name().endsWith(".java")) {
+										System.out.println("Class changed: " + file.path());
+										
+										queueToCompile.push(file);
+										
+										break;
+									}
+									
+									 if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+										 if (Files.isDirectory(file.file().toPath(), LinkOption.NOFOLLOW_LINKS)) {
+											 registerDir(file);
+										 }
+						             }
+									 
+									
+								}
+							}
+							
+							boolean valid = key.reset();
+						    if (!valid) {
+						    	keys.remove(key);
+						       	if (keys.isEmpty()) {
+						       		break;
+						       	}
+						    }
+						}
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			
+			watcherThread.start();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
+	public void registerDir(FileHandle dir) throws IOException {
+		keys.put(dir.file().toPath().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE), dir);
+
+		for(FileHandle fh : dir.list()) {
+			if(fh.isDirectory()) {
+				registerDir(fh);
+			}
+		}
+	}
 	public static FileHandle getLunaLireRootFolder() {
 		if(rootFolder == null)
 		rootFolder = Gdx.files.absolute(new File(System.getProperty("user.dir")).getParentFile().getParentFile().getParentFile().getAbsolutePath());
@@ -146,6 +242,17 @@ public class Editor extends ApplicationAdapter {
 
 	public void render () {
 		AwesomeLibGDX.render();
+		
+		while(!queueToCompile.isEmpty()) {
+			FileHandle f = queueToCompile.pop();
+			try {
+				Editor.getInstance().getUIState().getSceneManager().compile(f);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void dispose () {
@@ -158,10 +265,6 @@ public class Editor extends ApplicationAdapter {
 		AwesomeLibGDX.resize(width, height);
 	}
 
-	public void refreshClassList() {
-		uiState.refreshClassList();
-	}
-
 	public LireSceneViewport getStage() {
 		return uiState.stage;
 	}
@@ -170,17 +273,9 @@ public class Editor extends ApplicationAdapter {
 		return selectedObjects;
 	}
 
-	public void refreshObjectProperties() {
-		uiState.refreshObjectProperties();
-	}
-
-	public FileExplorer getFileExplorer() {
-		return uiState.explorer;
-	}
-
 	public void newScenePopup() {
 		uiState.createNewScenePopup();
-		getFileExplorer().refreshContents();
+		uiState.getWindow(FileExplorer.class).refreshContents();
 	}
 
 	public UIState getUIState() {
@@ -198,12 +293,15 @@ public class Editor extends ApplicationAdapter {
 	
 	public Class getClassFromFile(FileHandle handle) throws ClassNotFoundException, MalformedURLException {
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		compiler.run(System.in, System.out, System.err, handle.path());
+		System.out.println(compiler.getClass().getCanonicalName());
+				
+		int ret = compiler.run(System.in, Editor.getInstance().getUIState().editorOut, Editor.getInstance().getUIState().editorErr, handle.path());
+		
+		if(ret != 0) return null;
 		
 		File sourceFolder = new File(Editor.getInstance().getCurrentProject().file().getAbsolutePath() + "/core/src");
 					
 		URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] {sourceFolder.toURI().toURL()});
-		//System.out.println(Class.forName(handle.nameWithoutExtension(), true, classLoader));
 		return Class.forName(getClassName(handle), true, classLoader);
 	}
 	
@@ -225,6 +323,17 @@ public class Editor extends ApplicationAdapter {
 			finalString += list[i] + ".";
 		}
 		return finalString.substring(0, finalString.length() - 1);
+	}
+
+
+	public void refreshObjectParameters(Class oldClass, Class newClass) {
+		System.out.println("Refreshing object parameters");
+		uiState.getStage().refreshObjectParams(oldClass, newClass);
+	}
+
+
+	public HashMap<FileHandle, Class> getCompiledClasses() {
+		return compiledClasses;
 	}
 	
 

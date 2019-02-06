@@ -68,6 +68,7 @@ project(":core") {
         compile group: 'com.github.oxo42', name: 'stateless4j', version: '2.5.0'
         compile "com.kotcrab.vis:vis-ui:$visuiVersion"
         implementation 'com.github.czyzby:gdx-lml-vis:1.9.1.9.6'
+        compile group: 'com.badlogicgames.gdx', name: 'gdx-tools', version: '1.9.9'
     }
 }
 

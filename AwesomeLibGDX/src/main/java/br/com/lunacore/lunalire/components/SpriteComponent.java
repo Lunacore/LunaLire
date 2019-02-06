@@ -151,6 +151,10 @@ public class SpriteComponent extends LireComponent{
 		
 		sb.setColor(1, 1, 1, 1);
 	}
+	
+	public void drawToEditor(Batch sb, float parentAlpha) {
+		draw(sb, parentAlpha);
+	}
 
 	@Override
 	public void dispose() {
@@ -281,21 +285,7 @@ public class SpriteComponent extends LireComponent{
 		return table;
 	}
 
-	static public String getLocalPath(FileHandle handle) {
-		if(handle == null) return "";
-		String[] aps = handle.path().split("/");
-		boolean found = false;
-		String finalString = "";
-		for(String s : aps) {
-			if(found) {
-				finalString += "/" + s;
-			}			
-			if(s.equals("assets")) {
-				found = true;
-			}
-		}		
-		return finalString.substring(1);
-	}
+
 
 	@Override
 	public Element getXmlElement(Element parent) {
@@ -324,6 +314,8 @@ public class SpriteComponent extends LireComponent{
 	public String getValidationCause() {
 		return "Object already has a SpriteComponent!";
 	}
+
+
 	
 
 }

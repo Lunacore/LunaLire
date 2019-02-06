@@ -1,18 +1,19 @@
 package br.com.lunacore.ui;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.ProcessBuilder.Redirect;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.VisWindow;
 
 import br.com.lunacore.Editor;
 import br.com.lunacore.UIState;
+import br.com.lunacore.custom.window.LireEditorWindow;
+import br.com.lunacore.custom.window.SettingsWindow;
 
 public class TopBar extends MenuBar{
 	
@@ -23,9 +24,39 @@ public class TopBar extends MenuBar{
 		this.state = state;
 		
 		createFile();
+		createProject();
 		createWindow();
 		createBuildRun();
 		
+	}
+	
+	public void createProject(){
+		Menu project = new Menu("Project");
+		
+		MenuItem settings = new MenuItem("Project Settings");
+		settings.addListener(new ClickListener() {
+			public void clicked(InputEvent event, float x, float y) {
+				
+				SettingsWindow st = new SettingsWindow();
+				
+				VisWindow dialog = new VisWindow("Project Settings");
+				dialog.add(st).grow();
+				dialog.setResizable(true);
+				dialog.centerWindow();
+				dialog.setSize(500, 500);
+				dialog.setModal(true);
+				dialog.addCloseButton();
+				Editor.getInstance().getUIState().getStage().addActor(dialog);
+				
+				//VisDialog
+				
+				//dialog.setSize(500, 500);
+				//dialog.centerWindow();
+			}
+		});
+		project.addItem(settings);
+		
+		addMenu(project);
 	}
 	
 	public void createBuildRun() {
@@ -51,10 +82,9 @@ public class TopBar extends MenuBar{
 						new Thread(new Runnable() {
 							public void run() {
 								try {
-									BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-									String line = null;
-									while((line = br.readLine()) != null) {
-										Editor.getInstance().getUIState().editorOut.println(line);
+									int line = -1;
+									while((line = p.getInputStream().read()) != -1) {
+										Editor.getInstance().getUIState().editorOut.write(line);
 									}
 								}
 								catch (Exception e) {
@@ -67,10 +97,9 @@ public class TopBar extends MenuBar{
 						new Thread(new Runnable() {
 							public void run() {
 								try {
-									BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-									String line = null;
-									while((line = br.readLine()) != null) {
-										Editor.getInstance().getUIState().editorOut.println(line);
+									int line = -1;
+									while((line = p.getErrorStream().read()) != -1) {
+										Editor.getInstance().getUIState().editorOut.write(line);
 									}
 								}
 								catch (Exception e) {
@@ -133,37 +162,15 @@ public class TopBar extends MenuBar{
 		//Window
 				Menu window = new Menu("Window");
 				
-				MenuItem windowClassList = new MenuItem("Class list");
-				windowClassList.addListener(new ClickListener() {
-					public void clicked(InputEvent event, float x, float y) {
-						state.openClassListWindow();
-					}
-				});
-				window.addItem(windowClassList);
-				
-				MenuItem windowAssetExplorer = new MenuItem("Assets explorer");
-				windowAssetExplorer.addListener(new ClickListener() {
-					public void clicked(InputEvent event, float x, float y) {
-						state.openAssetExplorerWindow();
-					}
-				});
-				window.addItem(windowAssetExplorer);
-				
-				MenuItem windowObjectProperties = new MenuItem("Object properties");
-				windowObjectProperties.addListener(new ClickListener() {
-					public void clicked(InputEvent event, float x, float y) {
-						state.openObjectPropertiesWindow();
-					}
-				});
-				window.addItem(windowObjectProperties);
-				
-				MenuItem windowConsole = new MenuItem("Console");
-				windowConsole.addListener(new ClickListener() {
-					public void clicked(InputEvent event, float x, float y) {
-						state.openConsoleWindow();
-					}
-				});
-				window.addItem(windowConsole);
+				for(final LireEditorWindow win : Editor.getInstance().getUIState().getWindowCollection().windows.keySet()) {
+					MenuItem windowClassList = new MenuItem(win.getTitle());
+					windowClassList.addListener(new ClickListener() {
+						public void clicked(InputEvent event, float x, float y) {
+							state.openWindow(win.getClass());
+						}
+					});
+					window.addItem(windowClassList);
+				}
 				
 				addMenu(window);
 	}

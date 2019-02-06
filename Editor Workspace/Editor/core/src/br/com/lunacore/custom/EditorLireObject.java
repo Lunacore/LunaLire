@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
 import br.com.lunacore.Editor;
+import br.com.lunacore.custom.window.LireObjectPropertiesUI;
 import br.com.lunacore.helper.Helper;
 import br.com.lunacore.lunalire.LireComponent;
 import br.com.lunacore.lunalire.LireObject;
@@ -109,11 +110,12 @@ public class EditorLireObject extends LireObject{
 								new Vector2()));
 						elo.calculateLimits();
 					}
-					Editor.getInstance().getUIState().refreshObjectProperties();
+					Editor.getInstance().getUIState().refreshWindow(LireObjectPropertiesUI.class);
 				}
 			}
 		});
 		stage.addActor(topLeft);
+		topLeft.toFront();
 		
 		bottomLeft = new Image(invisible);
 		bottomLeft.setSize(20, 20);
@@ -159,11 +161,12 @@ public class EditorLireObject extends LireObject{
 						elo.calculateLimits();
 						
 					}
-					Editor.getInstance().getUIState().refreshObjectProperties();
+					Editor.getInstance().getUIState().refreshWindow(LireObjectPropertiesUI.class);
 				}
 			}
 		});
 		stage.addActor(bottomLeft);
+		bottomLeft.toFront();
 		
 		topRight = new Image(invisible);
 		topRight.setSize(20, 20);
@@ -208,11 +211,12 @@ public class EditorLireObject extends LireObject{
 								new Vector2()));
 						elo.calculateLimits();
 					}
-					Editor.getInstance().getUIState().refreshObjectProperties();
+					Editor.getInstance().getUIState().refreshWindow(LireObjectPropertiesUI.class);
 				}
 			}
 		});
 		stage.addActor(topRight);
+		topRight.toFront();
 		
 		bottomRight = new Image(invisible);
 		bottomRight.setSize(20, 20);
@@ -257,12 +261,13 @@ public class EditorLireObject extends LireObject{
 								new Vector2()));
 						elo.calculateLimits();
 					}
-					Editor.getInstance().getUIState().refreshObjectProperties();
+					Editor.getInstance().getUIState().refreshWindow(LireObjectPropertiesUI.class);
 				}
 
 			}
 		});
 		stage.addActor(bottomRight);
+		bottomRight.toFront();
 	}
 	
 	public void dispose() {
@@ -473,6 +478,10 @@ public class EditorLireObject extends LireObject{
 			childParams = new HashMap<String, String>();
 		}
 		childParams.put(key, value);
+	}
+	
+	public void removeParam(String key) {
+		childParams.remove(key);
 	}
 	
 	public String getParam(String key) {

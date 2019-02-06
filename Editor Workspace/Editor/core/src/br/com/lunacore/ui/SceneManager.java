@@ -17,20 +17,22 @@ import br.com.lunacore.custom.CustomXmlWriter;
 import br.com.lunacore.custom.EditorLireObject;
 import br.com.lunacore.custom.YesNoDialog;
 import br.com.lunacore.custom.YesNoDialog.DialogListener;
+import br.com.lunacore.custom.window.ClassListUI;
+import br.com.lunacore.custom.window.FileExplorer;
+import br.com.lunacore.custom.window.LireObjectPropertiesUI;
+import br.com.lunacore.custom.window.ObjectHierarchy;
+import br.com.lunacore.lunalire.LireComponent;
 import br.com.lunacore.lunalire.LunaLireStarter;
-import br.com.lunacore.lunalire.components.SpriteComponent;
 
 public class SceneManager extends VisTable{
 
-	UIState state;
 	HashMap<String, FileHandle> scenes;
 	FileHandle currentScene = null;
 	
 	boolean saved = true;
 	
-	public SceneManager(UIState state) {
+	public SceneManager() {
 		super();
-		this.state = state;
 		construct();
 		scenes = new HashMap<String, FileHandle>();
 	}
@@ -50,16 +52,41 @@ public class SceneManager extends VisTable{
 			}
 			else {
 				if(file.name().endsWith(".java")) {
-					System.out.println("Compiling file " + file.path());
 					Class c = Editor.getInstance().getClassFromFile(file);
-					System.out.println("Success! " + c.getCanonicalName());
-					System.out.println("Fields:");
-					for(Field f : c.getFields()) {
-						System.out.println("\t" + f.getType().getSimpleName() + " " + f.getName());
-					}
+					
+					if(Editor.getInstance().getCompiledClasses().get(file) != null)
+					Editor.getInstance().refreshObjectParameters(Editor.getInstance().getCompiledClasses().get(file), c);
+					
+					Editor.getInstance().getCompiledClasses().put(file, c);
+					System.out.println("File compiled: " + file.path());
+					
 				}
 			}
 		}
+		Editor.getInstance().getUIState().refreshWindow(ClassListUI.class);
+		Editor.getInstance().getUIState().refreshWindow(LireObjectPropertiesUI.class);
+	}
+	
+	public void compile(FileHandle file) throws ClassNotFoundException, MalformedURLException {		
+		if(file.name().endsWith(".java")) {
+			Class c = Editor.getInstance().getClassFromFile(file);
+			if(c != null) {
+				Class oldClass = Editor.getInstance().getCompiledClasses().get(file);
+				
+				Editor.getInstance().getCompiledClasses().put(file, c);
+				System.out.println("File compiled: " + file.path());
+				for(Field f : c.getFields()) {
+					System.out.println("\t" + f.getType().getSimpleName() + " " + f.getName());
+				}
+				
+				if(oldClass != null) {
+					Editor.getInstance().refreshObjectParameters(oldClass, c);
+				}
+			}
+			
+		}
+		Editor.getInstance().getUIState().refreshWindow(ClassListUI.class);
+		Editor.getInstance().getUIState().refreshWindow(LireObjectPropertiesUI.class);
 	}
 	
 	public void loadScene() {
@@ -87,10 +114,10 @@ public class SceneManager extends VisTable{
 						}
 						
 						public void accept(Object obj) {
-							state.createNewScenePopup();
+							Editor.getInstance().getUIState().createNewScenePopup();
 						}
 					});
-		state.addDialog(dialog);
+		Editor.getInstance().getUIState().addDialog(dialog);
 			
 			//No scenes
 			//Pergunta pro usuario se ele quer criar uma cena
@@ -136,7 +163,7 @@ public class SceneManager extends VisTable{
 			//String className = Helper.classify(sceneName);
 			
 			//Primeiro cria o arquivo da cena
-			FileHandle toSave = Editor.getInstance().getFileExplorer().selectedFolder.child(sceneName + ".ls");
+			FileHandle toSave = Editor.getInstance().getUIState().getWindow(FileExplorer.class).getSelectedFolder().child(sceneName + ".ls");
 			toSave.file().createNewFile();
 			CustomXmlWriter writer = new CustomXmlWriter(toSave);
 			
@@ -151,7 +178,7 @@ public class SceneManager extends VisTable{
 			Element root = reader.parse(Editor.getInstance().getCurrentProject().child("project.ll"));
 			
 			Element sceneElement = new Element("scene", root);
-			sceneElement.setAttribute("loc", SpriteComponent.getLocalPath(toSave));
+			sceneElement.setAttribute("loc", LireComponent.getLocalPath(toSave));
 			root.addChild(sceneElement);
 			
 			writer = new CustomXmlWriter(Editor.getInstance().getCurrentProject().child("project.ll"));
@@ -195,7 +222,7 @@ public class SceneManager extends VisTable{
 			lr.attachChildren(loadObjElement(e));
 		}
 		
-		state.addObjectToViewport(lr);
+		Editor.getInstance().getUIState().addObjectToViewport(lr);
 		return lr;
 	}
 	
@@ -207,13 +234,13 @@ public class SceneManager extends VisTable{
 			XmlReader reader = new XmlReader();
 			Element root = reader.parse(handle);
 			
-			state.resetScene();
+			Editor.getInstance().getUIState().resetScene();
 			
 			for(Element e : root.getChildrenByName("object")) {
 				loadObjElement(e);
 			}
 			
-			state.refreshObjectHierarchy();
+			Editor.getInstance().getUIState().refreshWindow(ObjectHierarchy.class);
 		}
 		else {
 			//Não achou a cena
@@ -256,7 +283,7 @@ public class SceneManager extends VisTable{
 			Element root = new Element("scene", null);
 			root.setAttribute("ID", getCurrentScene().getAttribute("ID"));
 			root.setAttribute("name", getCurrentScene().getAttribute("name"));
-			state.getHierarchy().insertIntoHierarchyElement(root);
+			Editor.getInstance().getUIState().getWindow(ObjectHierarchy.class).insertIntoHierarchyElement(root);
 			
 			try {
 				CustomXmlWriter writer = new CustomXmlWriter(getCurrentSceneFileHandle());

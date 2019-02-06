@@ -1,0 +1,66 @@
+package br.com.lunacore.lunalire.components;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.XmlReader.Element;
+import com.kotcrab.vis.ui.widget.VisTable;
+
+import br.com.lunacore.lunalire.LireComponent;
+import br.com.lunacore.lunalire.LireObject;
+
+public class ParticleComponent extends LireComponent{
+
+	ParticleEffect particle;
+	FileHandle handle;
+	
+	public void create() {
+		
+	}
+
+	public void draw(Batch sb, float parentAlpha) {
+		
+	}
+
+	public void dispose() {
+		
+	}
+
+	public Rectangle getLimits() {
+		return null;
+	}
+
+	public void drawToEditor(Batch sb, float parentAlpha) {
+		
+	}
+
+	public boolean validate(LireObject obj) {
+		return false;
+	}
+
+	public String getValidationCause() {
+		return null;
+	}
+
+	public void act(float delta) {
+		
+	}
+
+	public void read(Element comp, FileHandle relativePath) {
+		if(comp.getAttribute("loc", null) != null) {
+			handle = new FileHandle(comp.getAttribute("loc"));
+		}
+		
+	}
+
+	public VisTable getUITable(DragAndDrop dragndrop) {
+		return null;
+	}
+
+	public Element getXmlElement(Element root) {
+		return null;
+	}
+
+}

@@ -40,53 +40,62 @@ public class LireScene {
 		camera.position.set(0, 0, 0);
 		
 		for(Element el : root.getChildrenByName("object")) {
-			LireObject lo = null;
-			if(el.getAttribute("class", null) != null) {
-				try {
-					Class c = LunaLireStarter.lireForName(el.getAttribute("class"));
-					lo = (LireObject) c.getConstructor(Element.class, FileHandle.class, LireScene.class).newInstance(el, null, this);
+			loadLireObject(el);
+		}
+	}
+	
+	private LireObject loadLireObject(Element element) {
+		LireObject lo = null;
+		if(element.getAttribute("class", null) != null) {
+			try {
+				Class c = LunaLireStarter.lireForName(element.getAttribute("class"));
+				lo = (LireObject) c.getConstructor(Element.class, FileHandle.class, LireScene.class).newInstance(element, null, this);
+				
+				for(Field f : c.getFields()) {
+					Element custom = element.getChildByName("custom");
 					
-					for(Field f : c.getFields()) {
-						Element custom = el.getChildByName("custom");
+					if(custom.getAttribute(f.getName(), null) != null) {
 						
-						if(custom.getAttribute(f.getName(), null) != null) {
-							
-							if(f.getType().equals(float.class)) {
-								f.set(lo, custom.getFloat(f.getName()));
-							}
-							else if(f.getType().equals(int.class)) {
-								f.set(lo, custom.getInt(f.getName()));
-							}
-							else if(f.getType().equals(String.class)) {
-								f.set(lo, custom.get(f.getName()));
-							}
-							else if(f.getType().equals(Texture.class)) {
-								f.set(lo, new Texture(custom.get(f.getName())));
-							}
-							else {
-								//Classe não suportada (por enquanto)
-							}
-							
+						if(f.getType().equals(float.class)) {
+							f.set(lo, custom.getFloat(f.getName()));
 						}
+						else if(f.getType().equals(int.class)) {
+							f.set(lo, custom.getInt(f.getName()));
+						}
+						else if(f.getType().equals(String.class)) {
+							f.set(lo, custom.get(f.getName()));
+						}
+						else if(f.getType().equals(Texture.class)) {
+							f.set(lo, new Texture(custom.get(f.getName())));
+						}
+						else {
+							//Classe não suportada (por enquanto)
+						}
+						
 					}
 				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
 			}
-			else {
-				lo = new LireObject(el, null, this);
-			}
-			
-			
-			System.out.println("Loading object " + lo.getName());
-			stage.addActor(lo);
-			objects.add(lo);
-			
-			if(lo.getComponent(CameraComponent.class) != null) {
-				setCameraActor(lo);
+			catch(Exception e) {
+				e.printStackTrace();
 			}
 		}
+		else {
+			lo = new LireObject(element, null, this);
+		}
+		
+		
+		System.out.println("Loading object " + lo.getName());
+		stage.addActor(lo);
+		objects.add(lo);
+		
+		if(lo.getComponent(CameraComponent.class) != null) {
+			setCameraActor(lo);
+		}
+		
+		for(Element child : element.getChildrenByName("object")) {
+			loadLireObject(child).setParent(lo);
+		}
+		return lo;
 	}
 	
 	public ArrayList<LireObject> getObjectsByName(String name){

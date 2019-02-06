@@ -1,0 +1,116 @@
+package br.com.lunacore.custom;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Locale;
+
+import com.kotcrab.vis.ui.widget.VisTextArea;
+
+import br.com.lunacore.Editor;
+
+public class ConsoleErrorStream extends PrintStream{
+
+	PrintStream sys;
+	
+	public ConsoleErrorStream(PrintStream sys) {
+		super(sys);
+		this.sys = sys;
+	}
+	
+	@Override
+	public void write(int b) {
+		Editor.getInstance().getUIState().printParallel(String.valueOf((char)b));
+	}
+	
+	@Override
+	public void print(String s) {
+		Editor.getInstance().getUIState().printParallel(s);
+	}
+	
+	@Override
+	public void println(String x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	
+	@Override
+	public void print(boolean b) {
+		Editor.getInstance().getUIState().printParallel(b+"");
+	}
+	
+	@Override
+	public void print(char c) {
+		Editor.getInstance().getUIState().printParallel(c+"");
+	}
+	
+	@Override
+	public void print(char[] s) {
+		Editor.getInstance().getUIState().printParallel(new String(s));
+	}
+	
+	@Override
+	public void print(double d) {
+		Editor.getInstance().getUIState().printParallel(d+"");
+	}
+
+	@Override
+	public void print(float f) {
+		Editor.getInstance().getUIState().printParallel(f+"");
+	}
+	
+	@Override
+	public void print(int i) {
+		Editor.getInstance().getUIState().printParallel(i+"");
+	}
+	
+	@Override
+	public void print(long l) {
+		Editor.getInstance().getUIState().printParallel(l+"");
+	}
+	
+	@Override
+	public void print(Object obj) {
+		Editor.getInstance().getUIState().printParallel(obj.toString());
+	}
+
+	@Override
+	public void println() {
+		Editor.getInstance().getUIState().printParallel("\n");
+	}
+	
+	@Override
+	public void println(boolean x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	
+	@Override
+	public void println(char x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	
+	@Override
+	public void println(char[] x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	
+	@Override
+	public void println(double x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	@Override
+	public void println(float x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	@Override
+	public void println(int x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	@Override
+	public void println(long x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+	@Override
+	public void println(Object x) {
+		Editor.getInstance().getUIState().printParallel(x + "\n");
+	}
+}

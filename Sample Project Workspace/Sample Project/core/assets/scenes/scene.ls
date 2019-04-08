@@ -1,17 +1,17 @@
 <scene name="Cena 1" ID="0">
 	<object z="0" name="Camera">
 		<transform>
-			<position x="-95.56128" y="-286.1482"/>
+			<position x="-72.314644" y="84.49667"/>
 			<rotation value="0.0"/>
 			<scale x="1.031007" y="1.0587174"/>
 		</transform>
 		<component class="br.com.lunacore.lunalire.components.CameraComponent">
-			<viewport zoom="1.0" width="1360.6086" height="807.03534"/>
+			<viewport zoom="1.0" width="1402.7971" height="854.4223"/>
 		</component>
 	</object>
 	<object class="br.com.lunacore.MyObject" z="1" name="Sidney">
 		<transform>
-			<position x="-427.12445" y="101.179375"/>
+			<position x="-471.26257" y="154.60973"/>
 			<rotation value="0.0"/>
 			<scale x="1.0" y="1.0"/>
 		</transform>
@@ -32,7 +32,7 @@
 	</object>
 	<object z="0" name="Particle">
 		<transform>
-			<position x="217.38062" y="267.5409"/>
+			<position x="493.82465" y="-227.27051"/>
 			<rotation value="0.0"/>
 			<scale x="1.0" y="1.0"/>
 		</transform>

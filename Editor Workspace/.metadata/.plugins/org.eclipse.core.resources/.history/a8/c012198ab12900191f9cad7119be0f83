@@ -1,5 +1,0 @@
-package br.com.lunacore.custom;
-
-public class LireEditorWindow extends VisTable{
-
-}

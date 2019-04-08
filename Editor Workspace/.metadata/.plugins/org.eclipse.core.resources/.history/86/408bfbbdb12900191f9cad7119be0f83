@@ -1,7 +1,0 @@
-package br.com.lunacore.custom.window;
-
-import com.kotcrab.vis.ui.widget.VisTable;
-
-public class LireEditorWindow extends VisTable{
-
-}

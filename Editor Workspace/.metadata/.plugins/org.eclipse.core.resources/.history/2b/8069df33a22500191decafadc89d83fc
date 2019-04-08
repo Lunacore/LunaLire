@@ -1,7 +1,0 @@
-package br.com.lunacore.custom;
-
-import com.badlogic.gdx.utils.XmlWriter;
-
-public class CustomXmlWriter extends XmlWriter{
-
-}

@@ -1,9 +1,0 @@
-package br.com.lunacore;
-
-import com.badlogic.gdx.files.FileHandle;
-
-import br.com.lunacore.lunalire.LireState;
-
-public class SimpleScene extends LireScene{
-
-}

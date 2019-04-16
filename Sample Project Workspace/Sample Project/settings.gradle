@@ -1,2 +1,2 @@
-include 'desktop', 'core', 'awesome'
-project(':awesome').projectDir = new File(settingsDir, '../../AwesomeLibGDX')
+include 'desktop', 'core', 'editor'
+project(':editor').projectDir = new File(settingsDir, '../../Editor')

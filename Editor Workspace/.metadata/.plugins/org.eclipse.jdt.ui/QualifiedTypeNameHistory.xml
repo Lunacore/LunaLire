@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Camera"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.utils.IntMap"/>
-<fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisList"/>
-<fullyQualifiedTypeName name="java.io.ObjectInputStream.GetField"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Pixmap"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.NinePatch"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.TextureRegion"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.Drawable"/>
 <fullyQualifiedTypeName name="br.com.lunacore.lunalire.utils.NinePatchLoader"/>
@@ -44,11 +38,9 @@
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType"/>
 <fullyQualifiedTypeName name="br.com.lunacore.ui.TopBar"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Color"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.utils.Align"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.Actor"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="com.kotcrab.vis.ui.widget.VisTable"/>
-<fullyQualifiedTypeName name="br.com.lunacore.Editor"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.math.Vector2"/>
 <fullyQualifiedTypeName name="br.com.lunacore.ui.LireObjectPropertiesUI"/>
 <fullyQualifiedTypeName name="br.com.lunacore.ui.ObjectHierarchy"/>
@@ -60,4 +52,12 @@
 <fullyQualifiedTypeName name="br.com.lunacore.custom.window.ClassListUI"/>
 <fullyQualifiedTypeName name="br.com.lunacore.custom.window.FileExplorer"/>
 <fullyQualifiedTypeName name="br.com.lunacore.custom.window.LireObjectPropertiesUI"/>
+<fullyQualifiedTypeName name="br.com.lunacore.awesome.AwesomeLibGDX"/>
+<fullyQualifiedTypeName name="br.com.lunacore.awesome.entities.ObjectInfo"/>
+<fullyQualifiedTypeName name="com.github.czyzby.lml.util.LmlUserObject.TableExtractor"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.utils.Align"/>
+<fullyQualifiedTypeName name="br.com.lunacore.editor.custom.window.ObjectHierarchy"/>
+<fullyQualifiedTypeName name="br.com.lunacore.Editor"/>
+<fullyQualifiedTypeName name="br.com.lunacore.editor.custom.window.LireObjectPropertiesUI"/>
+<fullyQualifiedTypeName name="br.com.lunacore.editor.custom.window.FileExplorer"/>
 </qualifiedTypeNameHistroy>

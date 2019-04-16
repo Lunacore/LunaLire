@@ -53,7 +53,7 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-    	compile project(":awesome")
+    	compile project(":editor")
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
@@ -69,7 +69,7 @@ project(":core") {
     }
 }
 
-project(":awesome") {
+project(":editor") {
     apply plugin: "java"
 
     dependencies {

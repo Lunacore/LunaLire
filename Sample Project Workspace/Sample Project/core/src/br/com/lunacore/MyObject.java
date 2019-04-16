@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
-import br.com.lunacore.lunalire.LireObject;
-import br.com.lunacore.lunalire.LireScene;
-
 public class MyObject extends LireObject{
 	
 	public float agora_eh_float;

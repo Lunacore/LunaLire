@@ -4,9 +4,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
-import br.com.lunacore.lunalire.LireObject;
-import br.com.lunacore.lunalire.LireScene;
-
 public class OtherObject extends LireObject{
 
 	public float aeita;
